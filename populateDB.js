@@ -24,20 +24,38 @@ function generateVehicleEntry() {
   };
 }
 
-const addVehicles = async () => {
+function generateAnimalEntry() {
+  const animals = {
+    dog: faker.animal.dog,
+    cat: faker.animal.cat,
+  };
+  // choose cat or dog
+  const animal = Object.keys(animals)[faker.datatype.number(1)];
+  return {
+    _id: new ObjectID(),
+    time: faker.time.recent(),
+    location: faker.address.nearbyGPSCoordinate(),
+    color: faker.commerce.color(),
+    breed: animals[animal](),
+    type: animal,
+  };
+}
+
+const addEntries = async (col_name, generator) => {
   await client.connect();
-  const col = await client.db("test").collection("Vehicles");
+  const col = await client.db("test").collection(col_name);
   console.log("Connected to DB");
-  const newVehicles = [];
+  const newEntries = [];
   for (let i = 1; i <= NUM_ENTRIES; i += 1) {
-    if (i % 100 === 0) console.log(`Creating vehicle ${i}`);
-    newVehicles.push(generateVehicleEntry());
+    if (i % 100 === 0) console.log(`Creating entry ${i}`);
+    newEntries.push(generator());
   }
 
-  console.log(`Adding vehicles to the DB...`);
-  const { insertedCount } = await col.insertMany(newVehicles);
-  console.log(`Inserted ${insertedCount} new vehicles`);
+  console.log(`Adding entries to the DB...`);
+  const { insertedCount } = await col.insertMany(newEntries);
+  console.log(`Inserted ${insertedCount} new entries`);
   process.exit(0);
 };
 
-addVehicles();
+addEntries("Vehicles", generateVehicleEntry);
+addEntries("Animals", generateAnimalEntry);
