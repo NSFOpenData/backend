@@ -54,7 +54,6 @@ const addEntries = async (col_name, generator) => {
   console.log(`Adding entries to the DB...`);
   const { insertedCount } = await col.insertMany(newEntries);
   console.log(`Inserted ${insertedCount} new entries`);
-  process.exit(0);
 };
 
 addEntries("Vehicles", generateVehicleEntry);
