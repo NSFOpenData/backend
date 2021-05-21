@@ -26,8 +26,13 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.get("/data", async (req, res) => {
+app.get("/vehicles", async (req, res) => {
   const data = await getData("Vehicles");
+  res.send(data);
+});
+
+app.get("/animals", async (req, res) => {
+  const data = await getData("Animals");
   res.send(data);
 });
 
