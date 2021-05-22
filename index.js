@@ -18,7 +18,7 @@ const getData = async (col_name) => {
     console.log("No documents found");
   }
   let ret = "";
-  await cursor.forEach((d) => (ret += JSON.stringify(d)));
+  await cursor.forEach(d => ret += JSON.stringify(d));
   return ret;
 };
 
@@ -28,12 +28,12 @@ app.get("/", (req, res) => {
 
 app.get("/vehicles", async (req, res) => {
   const data = await getData("Vehicles");
-  res.send(data);
+  res.json(data);
 });
 
 app.get("/animals", async (req, res) => {
   const data = await getData("Animals");
-  res.send(data);
+  res.json(data);
 });
 
 app.listen(port, () => {
