@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node index.js",
-    "populate": "node populateDB.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "node index.js",
+    "populate": "node populateDB.js"
   },
   "author": "",
   "license": "MIT",

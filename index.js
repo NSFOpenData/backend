@@ -17,8 +17,8 @@ const getData = async (col_name) => {
   if ((await cursor.count()) === 0) {
     console.log("No documents found");
   }
-  let ret = "";
-  await cursor.forEach(d => ret += JSON.stringify(d));
+  let ret = [];
+  await cursor.forEach(d => ret.push(JSON.stringify(d)));
   return ret;
 };
 
