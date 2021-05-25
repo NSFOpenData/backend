@@ -1,8 +1,9 @@
 const express = require("express")
 const { graphqlHTTP } = require("express-graphql")
-const mongoose = require("mongoose")
 const graphqlSchema = require("./graphql/schema")
 const graphqlResolvers = require("./graphql/resolvers")
+const cors = require("cors")
+const mongoose = require("mongoose")
 require("dotenv").config()
 
 const app = express()
@@ -10,6 +11,8 @@ const app = express()
 app.get("/", (req, res) => {
   res.send("Hello World! This is a GraphQL API");
 })
+
+app.use(cors())
 
 app.use(
   "/graphql",
