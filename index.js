@@ -19,6 +19,7 @@ const getData = async (col_name) => {
   }
   let ret = [];
   await cursor.forEach(d => ret.push(JSON.stringify(d)));
+  client.close();
   return ret;
 };
 

@@ -22,7 +22,7 @@ function generateVehicleEntry() {
     model: model,
     license: faker.vehicle.vrm(),
   };
-}
+};
 
 function generateAnimalEntry() {
   const animals = {
@@ -39,22 +39,27 @@ function generateAnimalEntry() {
     breed: animals[animal](),
     type: animal,
   };
-}
+};
 
-const addEntries = async (col_name, generator) => {
+function generate(entry) {
+  const newEntries = [];
+  for (let i = 1; i <= NUM_ENTRIES; ++i) {
+    if (i % 10 === 0) console.log(`Creating entry ${i}`);
+    newEntries.push(entry());
+  };
+  return newEntries;
+};
+
+const addEntries = async (col_name, entry) => {
   await client.connect();
   const col = await client.db("test").collection(col_name);
   console.log("Connected to DB");
-  const newEntries = [];
-  for (let i = 1; i <= NUM_ENTRIES; i += 1) {
-    if (i % 100 === 0) console.log(`Creating entry ${i}`);
-    newEntries.push(generator());
-  }
 
   console.log(`Adding entries to the DB...`);
-  const { insertedCount } = await col.insertMany(newEntries);
+  const { insertedCount } = await col.insertMany(generate(entry));
   console.log(`Inserted ${insertedCount} new entries`);
 };
 
 addEntries("Vehicles", generateVehicleEntry);
 addEntries("Animals", generateAnimalEntry);
+process.exit(0)
