@@ -20,12 +20,30 @@ module.exports = buildSchema(`
         license: String
     }
 
+    type Animal {
+        _id: ID!
+        createdAt: Float!
+        location: [String!]!
+        color: String
+        breed: String
+        type: String
+    }
+
+    input AnimalInput {
+        location: [String!]!
+        color: String
+        breed: String
+        type: String
+    }
+
     type Query {
         vehicles: [Vehicle!]
+        animals: [Animal!]
     }
 
     type Mutation {
         createVehicle(vehicle:VehicleInput): Vehicle
+        createAnimal(animal:AnimalInput): Animal
     }
 
     schema {

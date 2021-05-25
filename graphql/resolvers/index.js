@@ -1,4 +1,5 @@
 const Vehicle = require("../../models/vehicle")
+const Animal = require("../../models/animal")
 
 module.exports = {
     vehicles: async () => {
@@ -32,4 +33,36 @@ module.exports = {
             throw error
         }
     },
+
+    animals: async () => {
+        try {
+            const animalsFetched = await Animal.find()
+            return animalsFetched.map(animal => {
+                return {
+                    ...animal._doc,
+                    _id: animal.id,
+                    createdAt: new Date(animal._doc.createdAt),
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    },
+
+    createAnimal: async args => {
+        try {
+            const { location, color, breed, type } = args.animal
+            const animal = new Animal({
+                location,
+                color,
+                breed,
+                type,
+            })
+            const newAnimal = await animal.save()
+            return { ...newAnimal._doc, _id: newAnimal.id }
+        } catch (error) {
+            throw error
+        }
+    },
+
 }

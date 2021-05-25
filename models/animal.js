@@ -2,20 +2,19 @@ const mongoose = require("mongoose")
 
 const Schema = mongoose.Schema
 
-const vehicleSchema = new Schema(
+const animalSchema = new Schema(
     {
         location: {
             type: [String],
             required: true,
         },
         color: String,
-        make: String,
-        model: String,
-        license: String
+        breed: String,
+        type: String,
     }, 
     {
         timestamps: true
     }
 )
 
-module.exports = mongoose.model("Vehicle", vehicleSchema, "Vehicles")  // specify collection name
+module.exports = mongoose.model("Animal", animalSchema, "Animals")
