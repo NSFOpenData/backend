@@ -15,7 +15,7 @@ function generateVehicleEntry() {
   model = model.join(" ");
   return {
     _id: new ObjectID(),
-    time: faker.time.recent(),
+    createdAt: faker.time.recent(),
     location: faker.address.nearbyGPSCoordinate(),
     color: faker.vehicle.color(),
     make: make,
@@ -33,7 +33,7 @@ function generateAnimalEntry() {
   const animal = Object.keys(animals)[faker.datatype.number(1)];
   return {
     _id: new ObjectID(),
-    time: faker.time.recent(),
+    createdAt: faker.time.recent(),
     location: faker.address.nearbyGPSCoordinate(),
     color: faker.commerce.color(),
     breed: animals[animal](),
@@ -63,7 +63,7 @@ module.exports = { addEntries };
 
 (async () => {
   await client.connect();
-  await addEntries("Vehicles", generator(generateVehicleEntry));
-  await addEntries("Animals", generator(generateAnimalEntry));
+  await addEntries("vehicles", generator(generateVehicleEntry));
+  // await addEntries("Animals", generator(generateAnimalEntry));
   process.exit(0);
 })();
