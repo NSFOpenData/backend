@@ -22,7 +22,7 @@ function generateVehicleEntry() {
     model: model,
     license: faker.vehicle.vrm(),
   };
-};
+}
 
 function generateAnimalEntry() {
   const animals = {
@@ -39,27 +39,31 @@ function generateAnimalEntry() {
     breed: animals[animal](),
     type: animal,
   };
-};
+}
 
-function generate(entry) {
+function generator(entryMaker) {
   const newEntries = [];
   for (let i = 1; i <= NUM_ENTRIES; ++i) {
     if (i % 10 === 0) console.log(`Creating entry ${i}`);
-    newEntries.push(entry());
-  };
+    newEntries.push(entryMaker());
+  }
   return newEntries;
-};
+}
 
-const addEntries = async (col_name, entry) => {
-  await client.connect();
+const addEntries = async (col_name, entries) => {
   const col = await client.db("test").collection(col_name);
   console.log("Connected to DB");
 
   console.log(`Adding entries to the DB...`);
-  const { insertedCount } = await col.insertMany(generate(entry));
+  const { insertedCount } = await col.insertMany(entries);
   console.log(`Inserted ${insertedCount} new entries`);
 };
 
-addEntries("Vehicles", generateVehicleEntry);
-addEntries("Animals", generateAnimalEntry);
-process.exit(0)
+module.exports = { addEntries };
+
+(async () => {
+  await client.connect();
+  await addEntries("Vehicles", generator(generateVehicleEntry));
+  await addEntries("Animals", generator(generateAnimalEntry));
+  process.exit(0);
+})();
