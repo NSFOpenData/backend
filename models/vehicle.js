@@ -5,7 +5,7 @@ const Schema = mongoose.Schema
 const vehicleSchema = new Schema(
     {
         location: {
-            type: String,
+            type: [String],
             required: true,
         },
         color: String,

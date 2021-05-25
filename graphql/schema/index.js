@@ -5,7 +5,7 @@ module.exports = buildSchema(`
     type Vehicle {
         _id: ID!
         createdAt: Float!
-        location: String!
+        location: [String!]!
         color: String
         make: String
         model: String
@@ -13,7 +13,7 @@ module.exports = buildSchema(`
     }
 
     input VehicleInput {
-        location: String!
+        location: [String!]!
         color: String
         make: String
         model: String
