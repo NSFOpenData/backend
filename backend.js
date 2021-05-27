@@ -4,13 +4,18 @@ const graphqlSchema = require("./graphql/schema")
 const graphqlResolvers = require("./graphql/resolvers")
 const cors = require("cors")
 const mongoose = require("mongoose")
+const expressPlayground =
+    require('graphql-playground-middleware-express').default;  // for testing auth
+
 require("dotenv").config()
 
 const app = express()
 
 app.get("/", (req, res) => {
-  res.send("Hello World! This is a GraphQL API");
+  res.send("Hello World! This is a GraphQL API. Check out /graphql or /playground")
 })
+
+app.get('/playground', expressPlayground({ endpoint: '/graphql' }))
 
 app.use(cors())
 

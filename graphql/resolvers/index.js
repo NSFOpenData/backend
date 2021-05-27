@@ -2,15 +2,19 @@ const Vehicle = require("../../models/vehicle")
 const Animal = require("../../models/animal")
 
 module.exports = {
-    vehicles: async () => {
+    vehicles: async (_, context) => {
         try {
             const vehiclesFetched = await Vehicle.find()
             return vehiclesFetched.map(vehicle => {
-                return {
+                let info = {
                     ...vehicle._doc,
                     _id: vehicle.id,
                     createdAt: new Date(vehicle._doc.createdAt),
                 }
+                const { authorization: token } = context.headers;
+                if (!token || token.split(" ")[1] !== process.env.PASSWORD) 
+                    info["license"] = null
+                return info
             })
         } catch (error) {
             throw error
