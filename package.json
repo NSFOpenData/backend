@@ -4,7 +4,8 @@
   "description": "",
   "main": "backend.js",
   "scripts": {
-    "server": "node backend.js"
+    "start": "node backend.js",
+    "populate": "node populateDB.js"
   },
   "repository": {
     "type": "git",
