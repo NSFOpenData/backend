@@ -1,4 +1,5 @@
 const express = require("express")
+const expressJWT = require("express-jwt")
 const { graphqlHTTP } = require("express-graphql")
 const graphqlSchema = require("./graphql/schema")
 const graphqlResolvers = require("./graphql/resolvers")
@@ -18,6 +19,12 @@ app.get("/", (req, res) => {
 app.get('/playground', expressPlayground({ endpoint: '/graphql' }))
 
 app.use(cors())
+
+app.use(expressJWT({
+  secret: process.env.JWT_SECRET,
+  algorithms: ["HS256"],
+  credentialsRequired: false
+}))
 
 app.use(
   "/graphql",

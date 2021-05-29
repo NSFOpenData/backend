@@ -36,14 +36,40 @@ module.exports = buildSchema(`
         type: String
     }
 
+    enum Role {
+        ADMIN
+        PRIVILEGED
+        USER
+    }
+
+    type User {
+        """
+        there will be a password field in db but it will not be queried
+        """
+        _id: ID!
+        createdAt: Float!
+        name: String!
+        email: String!
+        role: Role!
+    }
+
+    input RegistrationInput {
+        name: String!
+        email: String!
+        password: String!
+    } 
+
     type Query {
         vehicles: [Vehicle!]
         animals: [Animal!]
+        me: User
     }
 
     type Mutation {
-        createVehicle(vehicle:VehicleInput): Vehicle
-        createAnimal(animal:AnimalInput): Animal
+        createVehicle(vehicle: VehicleInput): Vehicle
+        createAnimal(animal: AnimalInput): Animal
+        register(user: RegistrationInput): User!
+        login(email: String!, password: String!): String
     }
 
     schema {
