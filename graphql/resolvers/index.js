@@ -7,93 +7,70 @@ const User = require("../../models/user")
 
 module.exports = {
     vehicles: async (_, { user }) => {
-        try {
-            const vehiclesFetched = await Vehicle.find()
-            return vehiclesFetched.map(vehicle => {
-                let info = {
-                    ...vehicle._doc,
-                    _id: vehicle.id,
-                    createdAt: new Date(vehicle._doc.createdAt),
-                }
-                if (!user || user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role !== "USER") 
-                    info["license"] = null
-                return info
-            })
-        } catch (error) {
-            throw error
-        }
+        const vehiclesFetched = await Vehicle.find()
+        return vehiclesFetched.map(vehicle => {
+            let info = {
+                ...vehicle._doc,
+                _id: vehicle.id,
+                createdAt: new Date(vehicle._doc.createdAt),
+            }
+            if (!user || user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role !== "USER") 
+                info["license"] = null
+            return info
+        })
     },
 
     createVehicle: async args => {
-        try {
-            const { location, color, make, model, license } = args.vehicle
-            const vehicle = new Vehicle({
-                location,
-                color,
-                make,
-                model,
-                license,
-            })
-            const newVehicle = await vehicle.save()
-            return { ...newVehicle._doc, _id: newVehicle.id }
-        } catch (error) {
-            throw error
-        }
+        const { location, color, make, model, license } = args.vehicle
+        const vehicle = new Vehicle({
+            location,
+            color,
+            make,
+            model,
+            license,
+        })
+        const newVehicle = await vehicle.save()
+        return { ...newVehicle._doc, _id: newVehicle.id }
     },
 
     animals: async () => {
-        try {
-            const animalsFetched = await Animal.find()
-            return animalsFetched.map(animal => {
-                return {
-                    ...animal._doc,
-                    _id: animal.id,
-                    createdAt: new Date(animal._doc.createdAt),
-                }
-            })
-        } catch (error) {
-            throw error
-        }
+        const animalsFetched = await Animal.find()
+        return animalsFetched.map(animal => {
+            return {
+                ...animal._doc,
+                _id: animal.id,
+                createdAt: new Date(animal._doc.createdAt),
+            }
+        })
     },
 
     createAnimal: async args => {
-        try {
-            const { location, color, breed, type } = args.animal
-            const animal = new Animal({
-                location,
-                color,
-                breed,
-                type,
-            })
-            const newAnimal = await animal.save()
-            return { ...newAnimal._doc, _id: newAnimal.id }
-        } catch (error) {
-            throw error
-        }
+        const { location, color, breed, type } = args.animal
+        const animal = new Animal({
+            location,
+            color,
+            breed,
+            type,
+        })
+        const newAnimal = await animal.save()
+        return { ...newAnimal._doc, _id: newAnimal.id }
     },
 
     me: async (_, { user }) => {
-        try {
-            return await User.findById(user.sub)
-        } catch (error) {
-            throw error
-        }
+        return await User.findById(user.sub)
     },
 
     register: async args => {
-        try {
-            const { name, email, password } = args.user
-            user = new User({
-                name,
-                email,
-                password: await bcrypt.hash(password, 10),
-                role: "USER",
-            })
-            const newUser = await user.save()
-            return { ...newUser._doc, _id: newUser.id }
-        } catch (error) {
-            throw error
-        }
+     const { name, email, password } = args.user
+     const user = new User({
+         name,
+         email,
+         password: await bcrypt.hash(password, 10),
+         role: "USER",
+     })
+     const newUser = await user.save()
+     return { ...newUser._doc, _id: newUser.id }
+     
     },
 
     login: async args => {
