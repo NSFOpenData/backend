@@ -17,9 +17,7 @@ module.exports = {
     },
 
     createVehicle: async ({ vehicle }) => {
-        const vehicleDoc = new Vehicle({
-            ...vehicle,
-        });
+        const vehicleDoc = new Vehicle(vehicle);
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
     },
@@ -29,9 +27,7 @@ module.exports = {
     },
 
     createAnimal: async ({ animal }) => {
-        const animalDoc = new Animal({
-            ...animal,
-        });
+        const animalDoc = new Animal(animal);
         const newAnimal = await animalDoc.save();
         return newAnimal;
     },
