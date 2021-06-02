@@ -1,6 +1,6 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
 
 const vehicleSchema = new Schema(
     {
@@ -11,11 +11,11 @@ const vehicleSchema = new Schema(
         color: String,
         make: String,
         model: String,
-        license: String
-    }, 
+        license: String,
+    },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
-module.exports = mongoose.model("Vehicle", vehicleSchema, "Vehicles")  // specify collection name
+module.exports = mongoose.model("Vehicle", vehicleSchema, "Vehicles"); // specify collection name

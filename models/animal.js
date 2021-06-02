@@ -1,6 +1,6 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const Schema = mongoose.Schema
+const Schema = mongoose.Schema;
 
 const animalSchema = new Schema(
     {
@@ -11,10 +11,10 @@ const animalSchema = new Schema(
         color: String,
         breed: String,
         type: String,
-    }, 
+    },
     {
-        timestamps: true
+        timestamps: true,
     }
-)
+);
 
-module.exports = mongoose.model("Animal", animalSchema, "Animals")
+module.exports = mongoose.model("Animal", animalSchema, "Animals");
