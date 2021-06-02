@@ -9,7 +9,8 @@ module.exports = {
     vehicles: async (_, { user }) => {
         const vehiclesFetched = await Vehicle.find();
         return vehiclesFetched.map(vehicle => {
-            if (!user || user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role !== "USER") vehicle.license = null;
+            // check if role has permissions
+            if (!user || !["USER", "ADMIN"].includes(user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role)) vehicle.license = null;
             return vehicle;
         });
     },
