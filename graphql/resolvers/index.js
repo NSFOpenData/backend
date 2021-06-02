@@ -8,58 +8,40 @@ const User = require("../../models/user");
 module.exports = {
     vehicles: async (_, { user }) => {
         const vehiclesFetched = await Vehicle.find();
-        return vehiclesFetched.map((vehicle) => {
-            let info = {
-                ...vehicle._doc,
-                _id: vehicle.id,
-                createdAt: new Date(vehicle._doc.createdAt),
-            };
-            if (!user || user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role !== "USER") info["license"] = null;
-            return info;
+        return vehiclesFetched.map(vehicle => {
+            if (!user || user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role !== "USER") vehicle.license = null;
+            return vehicle;
         });
     },
 
-    createVehicle: async (args) => {
-        const { location, color, make, model, license } = args.vehicle;
-        const vehicle = new Vehicle({
-            location,
-            color,
-            make,
-            model,
-            license,
+    createVehicle: async ({ vehicle }) => {
+        const vehicleDoc = new Vehicle({
+            ...vehicle,
         });
-        const newVehicle = await vehicle.save();
-        return { ...newVehicle._doc, _id: newVehicle.id };
+        const newVehicle = await vehicleDoc.save();
+        return newVehicle;
     },
 
     animals: async () => {
-        const animalsFetched = await Animal.find();
-        return animalsFetched.map((animal) => {
-            return {
-                ...animal._doc,
-                _id: animal.id,
-                createdAt: new Date(animal._doc.createdAt),
-            };
-        });
+        return await Animal.find();
     },
 
-    createAnimal: async (args) => {
-        const { location, color, breed, type } = args.animal;
-        const animal = new Animal({
-            location,
-            color,
-            breed,
-            type,
+    createAnimal: async ({ animal }) => {
+        const animalDoc = new Animal({
+            ...animal,
         });
-        const newAnimal = await animal.save();
-        return { ...newAnimal._doc, _id: newAnimal.id };
+        const newAnimal = await animalDoc.save();
+        return newAnimal;
     },
 
     me: async (_, { user }) => {
-        return await User.findById(user.sub);
+        const found = await User.findById(user.sub);
+        if (!found) 
+            throw new Error("User not found.");
+        return found;
     },
 
-    register: async (args) => {
+    register: async args => {
         const { name, email, password } = args.user;
         const user = new User({
             name,
@@ -71,8 +53,7 @@ module.exports = {
         return { ...newUser._doc, _id: newUser.id };
     },
 
-    login: async (args) => {
-        const { email, password } = args;
+    login: async ({ email, password }) => {
         console.log(email);
         console.log(password);
         const user = await User.findOne({ email: email });
