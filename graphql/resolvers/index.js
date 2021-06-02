@@ -10,7 +10,8 @@ module.exports = {
         const vehiclesFetched = await Vehicle.find();
         return vehiclesFetched.map(vehicle => {
             // check if role has permissions
-            if (!user || !["USER", "ADMIN"].includes(user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role)) vehicle.license = null;
+            if (!user || !["USER", "ADMIN"].includes(user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role))
+                vehicle.license = null;
             return vehicle;
         });
     },
@@ -24,7 +25,7 @@ module.exports = {
     },
 
     animals: async () => {
-        return await Animal.find();
+        return Animal.find();
     },
 
     createAnimal: async ({ animal }) => {
@@ -37,8 +38,7 @@ module.exports = {
 
     me: async (_, { user }) => {
         const found = await User.findById(user.sub);
-        if (!found) 
-            throw new Error("User not found.");
+        if (!found) throw new Error("User not found.");
         return found;
     },
 
@@ -51,12 +51,10 @@ module.exports = {
             role: "USER",
         });
         const newUser = await user.save();
-        return { ...newUser._doc, _id: newUser.id };
+        return newUser;
     },
 
     login: async ({ email, password }) => {
-        console.log(email);
-        console.log(password);
         const user = await User.findOne({ email: email });
         console.log(user);
         if (!user) throw new Error("User not found.");
