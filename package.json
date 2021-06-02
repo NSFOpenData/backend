@@ -5,7 +5,7 @@
     "main": "backend.js",
     "scripts": {
         "start": "node backend.js",
-        "populate": "node populateDB.js"
+        "populate": "node scripts/populateDB.js"
     },
     "repository": {
         "type": "git",
