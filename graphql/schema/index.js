@@ -70,6 +70,7 @@ module.exports = buildSchema(`
         createAnimal(animal: AnimalInput): Animal
         register(user: RegistrationInput): User!
         login(email: String!, password: String!): String
+        addPrivilege(email: String!): String
     }
 
     schema {

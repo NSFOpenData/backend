@@ -10,7 +10,7 @@ module.exports = {
         const vehiclesFetched = await Vehicle.find();
         return vehiclesFetched.map(vehicle => {
             // check if role has permissions
-            if (!user || !["USER", "ADMIN"].includes(user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role))
+            if (!user || !["PRIVILEGED", "ADMIN"].includes(user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role))
                 vehicle.license = null;
             return vehicle;
         });
@@ -36,6 +36,17 @@ module.exports = {
         const found = await User.findById(user.sub);
         if (!found) throw new Error("User not found.");
         return found;
+    },
+
+    addPrivilege: async ({ email }, { user }) => {
+        console.log(email, user);
+        if (!user || user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role !== "ADMIN")
+            throw new Error("You are missing or have invalid credentials.");
+        const found = await User.findOne({ email: email });
+        if (!found) throw new Error("No user found for that email.");
+        found.role = "PRIVILEGED";
+        await found.save();
+        return `${found.name} has been given access privileges.`;
     },
 
     register: async args => {
