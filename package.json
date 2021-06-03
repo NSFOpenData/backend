@@ -5,7 +5,8 @@
     "main": "backend.js",
     "scripts": {
         "start": "node backend.js",
-        "populate": "node scripts/populateDB.js"
+        "populate": "node scripts/populateDB.js",
+        "prod": "env NODE_ENV=production npm start"
     },
     "repository": {
         "type": "git",
