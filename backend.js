@@ -5,6 +5,7 @@ const graphqlSchema = require("./graphql/schema");
 const graphqlResolvers = require("./graphql/resolvers");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
 const expressPlayground = require("graphql-playground-middleware-express").default; // for testing auth
 
 require("dotenv").config();
@@ -18,6 +19,8 @@ app.get("/", (req, res) => {
 app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 
 app.use(cors());
+
+app.use(helmet());
 
 app.use(
     expressJWT({
