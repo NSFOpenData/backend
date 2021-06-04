@@ -40,7 +40,8 @@ module.exports = {
 
     addPrivilege: async ({ email }, { user }) => {
         console.log(email, user);
-        if (!user || user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role !== "ADMIN")
+        const author = await User.findById(user.sub);
+        if (!author || author.role !== "ADMIN")
             throw new Error("You are missing or have invalid credentials.");
         const found = await User.findOne({ email: email });
         if (!found) throw new Error("No user found for that email.");
