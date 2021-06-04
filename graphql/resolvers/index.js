@@ -64,7 +64,7 @@ module.exports = {
 
     login: async ({ email, password }) => {
         const user = await User.findOne({ email: email });
-        console.log(user);
+        console.log("User logged in:", user, new Date());
         if (!user) throw new Error("User not found.");
         const { id, password: dbPassword, role } = user;
 
