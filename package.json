@@ -29,7 +29,8 @@
         "graphql-playground-middleware-express": "^1.7.22",
         "helmet": "^4.6.0",
         "jsonwebtoken": "^8.5.1",
-        "mongoose": "^5.12.11"
+        "mongoose": "^5.12.11",
+        "node-fetch": "^2.6.1"
     },
     "devDependencies": {
         "eslint": "^7.27.0",
