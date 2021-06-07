@@ -36,15 +36,19 @@ const getAuthToken = async () => {
         });
 };
 
-const uploadFile = async () => {
+const uploadFile = async (file) => {
     const authToken = await getAuthToken();
-    const stream = createReadStream("backend.js");
-    const data = await fetch("https://swift.isis.vanderbilt.edu/swift/v1/test/", {
+    const stream = createReadStream(file);
+    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${file}`;
+    const data = await fetch( url, {
         method: "put",
         body: stream,
-        headers: { "X-Auth-Token": authToken },
+        headers: { 
+            "X-Auth-Token": authToken,
+            "X-Detect-Content-Type": true,
+        },
     });
     console.log(data);
 };
 
-(async () => uploadFile())();
+(async () => uploadFile("backend.js"))();
