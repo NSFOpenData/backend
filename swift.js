@@ -1,3 +1,4 @@
+const { createReadStream } = require("fs");
 const fetch = require("node-fetch");
 require("dotenv").config();
 
@@ -35,7 +36,15 @@ const getAuthToken = async () => {
         });
 };
 
-(async () => {
-    console.log(await getAuthToken());
-    console.log(await getAuthToken());
-})();
+const uploadFile = async () => {
+    const authToken = await getAuthToken();
+    const stream = createReadStream("backend.js");
+    const data = await fetch("https://swift.isis.vanderbilt.edu/swift/v1/test/", {
+        method: "put",
+        body: stream,
+        headers: { "X-Auth-Token": authToken },
+    });
+    console.log(data);
+};
+
+(async () => uploadFile())();
