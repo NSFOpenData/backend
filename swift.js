@@ -25,8 +25,7 @@ const getAuthToken = async () => {
             console.log(resp.headers.get("X-Subject-Token"));
             return resp.json();
         })
-        .then(data => console.log(data.expires_at));
+        .then(data => console.log(data.token.expires_at));
 };
 
-
-getAuthToken();
+(async () => getAuthToken())();
