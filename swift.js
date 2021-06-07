@@ -1,7 +1,11 @@
 const fetch = require("node-fetch");
 require("dotenv").config();
 
+let token = "";
+let expiry = "";
+
 const getAuthToken = async () => {
+    if (expiry && new Date() < new Date(expiry)) return token;
     const body = {
         auth: {
             identity: {
@@ -16,16 +20,22 @@ const getAuthToken = async () => {
             },
         },
     };
-    await fetch("https://keystone.isis.vanderbilt.edu:5000/v3/auth/tokens", {
+    return await fetch("https://keystone.isis.vanderbilt.edu:5000/v3/auth/tokens", {
         method: "post",
         body: JSON.stringify(body),
         headers: { "Content-Type": "application/json" },
     })
         .then(resp => {
-            console.log(resp.headers.get("X-Subject-Token"));
+            token = resp.headers.get("X-Subject-Token");
             return resp.json();
         })
-        .then(data => console.log(data.token.expires_at));
+        .then(data => {
+            expiry = data.token.expires_at;
+            return token;
+        });
 };
 
-(async () => getAuthToken())();
+(async () => {
+    console.log(await getAuthToken());
+    console.log(await getAuthToken());
+})();
