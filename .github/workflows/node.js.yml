@@ -25,5 +25,5 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
             - run: npm ci
-            - run: npx prettier -c .
+            - run: npx prettier -c "**/*.js"
             - run: npx eslint .
