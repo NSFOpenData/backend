@@ -6,7 +6,9 @@ let token = "";
 let expiry = "";
 
 const getAuthToken = async () => {
+    // reuse token if not expired
     if (expiry && new Date() < new Date(expiry)) return token;
+
     const body = {
         auth: {
             identity: {
@@ -21,6 +23,7 @@ const getAuthToken = async () => {
             },
         },
     };
+
     return await fetch("https://keystone.isis.vanderbilt.edu:5000/v3/auth/tokens", {
         method: "post",
         body: JSON.stringify(body),
@@ -36,10 +39,9 @@ const getAuthToken = async () => {
         });
 };
 
-const uploadFile = async file => {
+const uploadFile = async (filename, stream) => {
     const authToken = await getAuthToken();
-    const stream = createReadStream(file);
-    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${file}`;
+    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${filename}`;
     const data = await fetch(url, {
         method: "put",
         body: stream,
@@ -51,4 +53,4 @@ const uploadFile = async file => {
     console.log(data);
 };
 
-(async () => uploadFile("backend.js"))();
+(async () => uploadFile("backend.js", createReadStream("backend.js")))();
