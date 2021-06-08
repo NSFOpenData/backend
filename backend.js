@@ -14,8 +14,24 @@ require("dotenv").config();
 
 const app = express();
 
+
+const html = `
+<!DOCTYPE html>
+    <head><title>nsf open data</title></head>
+    <body>
+    Hello World! This is a GraphQL API. Check out /graphql or /playground<br>
+    <form action="/upload" enctype="multipart/form-data" method="post">
+    <div>
+        <input type="file" name="file">
+        <input type="submit" value="upload">            
+    </div>
+    </form>
+    </body>
+</html>
+`
+
 app.get("/", (req, res) => {
-    res.send("Hello World! This is a GraphQL API. Check out /graphql or /playground");
+    res.send(html);
 });
 
 app.get("/playground", expressPlayground({ endpoint: "/graphql" }));

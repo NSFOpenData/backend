@@ -53,4 +53,4 @@ const uploadFile = async (filename, stream) => {
     return data.status;
 };
 
-module.exports = uploadFile;
+module.exports = { uploadFile };
