@@ -1,4 +1,3 @@
-const { createReadStream } = require("fs");
 const fetch = require("node-fetch");
 require("dotenv").config();
 
@@ -51,7 +50,7 @@ const uploadFile = async (filename, stream) => {
         },
     });
     console.log(data);
-    return data.status_code;
+    return data.status;
 };
 
 module.exports = uploadFile;

@@ -23,9 +23,12 @@ app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.post("/upload", upload.single('file'), function (req, res, next) {
-    uploadFile(req.originalname, req.buffer);
-})
+app.post("/upload", upload.single("file"), async function (req, res) {
+    const status = await uploadFile(req.originalname, req.buffer);
+    if (status === 201) return res.send("file created successfully");
+    if (status === 503) return res.send("service unavailable 503");
+    return res.send(status);
+});
 
 app.use(cors());
 
