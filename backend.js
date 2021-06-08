@@ -40,7 +40,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.post("/upload", upload.single("file"), async function (req, res) {
-    const status = await uploadFile(req.originalname, req.buffer);
+    const status = await uploadFile(req.file.originalname, req.file.buffer);
     if (status === 201) return res.send("file created successfully");
     if (status === 503) return res.send("service unavailable 503");
     return res.send(status);
