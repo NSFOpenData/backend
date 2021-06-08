@@ -51,6 +51,7 @@ const uploadFile = async (filename, stream) => {
         },
     });
     console.log(data);
+    return data.status_code;
 };
 
-(async () => uploadFile("backend.js", createReadStream("backend.js")))();
+module.exports = uploadFile;

@@ -3,9 +3,11 @@ const expressJWT = require("express-jwt");
 const { graphqlHTTP } = require("express-graphql");
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolvers = require("./graphql/resolvers");
+const { uploadFile } = require("./swift");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
+const multer = require("multer");
 const expressPlayground = require("graphql-playground-middleware-express").default; // for testing auth
 
 require("dotenv").config();
@@ -17,6 +19,13 @@ app.get("/", (req, res) => {
 });
 
 app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+app.post("/upload", upload.single('file'), function (req, res, next) {
+    uploadFile(req.originalname, req.buffer);
+})
 
 app.use(cors());
 
