@@ -14,7 +14,6 @@ require("dotenv").config();
 
 const app = express();
 
-
 const html = `
 <!DOCTYPE html>
     <head><title>nsf open data</title></head>
@@ -22,13 +21,13 @@ const html = `
     Hello World! This is a GraphQL API. Check out /graphql or /playground<br>
     <form action="/upload" enctype="multipart/form-data" method="post">
     <div>
-        <input type="file" name="file">
+        <input type="file" name="images">
         <input type="submit" value="upload">            
     </div>
     </form>
     </body>
 </html>
-`
+`;
 
 app.get("/", (req, res) => {
     res.send(html);
@@ -39,11 +38,19 @@ app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.post("/upload", upload.single("file"), async function (req, res) {
-    const status = await uploadFile(req.file.originalname, req.file.buffer);
-    if (status === 201) return res.send("file created successfully");
-    if (status === 503) return res.send("service unavailable 503");
-    return res.send(status);
+app.post("/upload", upload.array("images"), async function (req, res) {
+    let summary = "";
+    try {
+        for (let file of req.files) {
+            const status = await uploadFile(file.originalname, file.buffer);
+            if (status === 201) summary += `${file.originalname} created successfully\n`;
+            else summary += `${file.originalname} bugged with status ${status}\n`;
+        }
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+    return res.send(summary);
 });
 
 app.use(cors());
