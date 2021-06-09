@@ -3,7 +3,7 @@ const expressJWT = require("express-jwt");
 const { graphqlHTTP } = require("express-graphql");
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolvers = require("./graphql/resolvers");
-const { uploadFile } = require("./swift");
+const { uploadFile, getFile } = require("./swift");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
@@ -51,6 +51,12 @@ app.post("/upload", upload.array("images"), async function (req, res) {
         throw error;
     }
     return res.send(summary);
+});
+
+app.get("/file/:filename", async (req, res) => {
+    console.log(`${req.params.filename} requested to be served`)
+    const file = await getFile(req.params.filename);
+    res.send(await file.buffer());
 });
 
 app.use(cors());

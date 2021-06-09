@@ -1,6 +1,8 @@
 const fetch = require("node-fetch");
 require("dotenv").config();
 
+const { SWIFT_USER, SWIFT_PASSWORD} = process.env;
+
 let token = "";
 let expiry = "";
 
@@ -14,9 +16,9 @@ const getAuthToken = async () => {
                 methods: ["password"],
                 password: {
                     user: {
-                        name: process.env.SWIFT_USER,
+                        name: SWIFT_USER,
                         domain: { id: "default" },
-                        password: process.env.SWIFT_PASSWORD,
+                        password: SWIFT_PASSWORD,
                     },
                 },
             },
@@ -49,8 +51,22 @@ const uploadFile = async (filename, stream) => {
             "X-Detect-Content-Type": true,
         },
     });
-    console.log(data);
     return data.status;
 };
 
-module.exports = { uploadFile };
+const getFile = async filename => {
+    console.log(`getting file ${filename} from api`);
+    const authToken = await getAuthToken();
+    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${filename}`;
+    const data = await fetch(url, {
+        method: "get",
+        headers: {
+            "X-Auth-Token": authToken,
+        },
+    });
+    console.log(data);
+    if (data.status === 200) return data; // file contents
+    throw new Error(`request errored: ${data.status}`)
+};
+
+module.exports = { uploadFile, getFile };
