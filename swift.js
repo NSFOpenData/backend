@@ -40,24 +40,25 @@ const getAuthToken = async () => {
         });
 };
 
-const uploadFile = async (filename, stream) => {
+const uploadFile = async (id, filename, stream) => {
     const authToken = await getAuthToken();
-    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${filename}`;
+    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${id}/${filename}`;
     const data = await fetch(url, {
         method: "put",
         body: stream,
         headers: {
             "X-Auth-Token": authToken,
             "X-Detect-Content-Type": true,
+            "X-Object-Meta-ID": id,
         },
     });
     return data.status;
 };
 
-const getFile = async filename => {
+const getFile = async (id, filename) => {
     console.log(`getting file ${filename} from api`);
     const authToken = await getAuthToken();
-    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${filename}`;
+    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${id}/${filename}`;
     const data = await fetch(url, {
         method: "get",
         headers: {

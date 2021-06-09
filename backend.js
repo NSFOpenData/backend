@@ -21,6 +21,7 @@ const html = `
     Hello World! This is a GraphQL API. Check out /graphql or /playground<br>
     <form action="/upload" enctype="multipart/form-data" method="post">
     <div>
+        <input type="text" placeholder="Object ID" name="id">
         <input type="file" name="images">
         <input type="submit" value="upload">            
     </div>
@@ -42,7 +43,7 @@ app.post("/upload", upload.array("images"), async function (req, res) {
     let summary = "";
     try {
         for (let file of req.files) {
-            const status = await uploadFile(file.originalname, file.buffer);
+            const status = await uploadFile(req.body.id, file.originalname, file.buffer);
             if (status === 201) summary += `${file.originalname} created successfully\n`;
             else summary += `${file.originalname} bugged with status ${status}\n`;
         }
@@ -53,10 +54,16 @@ app.post("/upload", upload.array("images"), async function (req, res) {
     return res.send(summary);
 });
 
-app.get("/file/:filename", async (req, res) => {
-    console.log(`${req.params.filename} requested to be served`)
-    const file = await getFile(req.params.filename);
-    res.send(await file.buffer());
+app.get("/file/:id/:filename", async (req, res) => {
+    const {id, filename} = req.params;
+    console.log(`${filename} requested to be served`)
+    try {
+        const file = await getFile(id, filename);
+        res.send(await file.buffer());
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
 });
 
 app.use(cors());
