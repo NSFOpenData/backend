@@ -12,6 +12,7 @@ const vehicleSchema = new Schema(
         make: String,
         model: String,
         license: String,
+        files: [String],
     },
     {
         timestamps: true,

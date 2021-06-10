@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 require("dotenv").config();
 
-const { SWIFT_USER, SWIFT_PASSWORD} = process.env;
+const { SWIFT_USER, SWIFT_PASSWORD } = process.env;
 
 let token = "";
 let expiry = "";
@@ -40,25 +40,25 @@ const getAuthToken = async () => {
         });
 };
 
-const uploadFile = async (id, filename, stream) => {
+const uploadFile = async (prefix, filename, stream) => {
     const authToken = await getAuthToken();
-    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${id}/${filename}`;
+    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${prefix}/${filename}`;
     const data = await fetch(url, {
         method: "put",
         body: stream,
         headers: {
             "X-Auth-Token": authToken,
             "X-Detect-Content-Type": true,
-            "X-Object-Meta-ID": id,
+            "X-Object-Meta-ID": prefix,
         },
     });
     return data.status;
 };
 
-const getFile = async (id, filename) => {
+const getFile = async (prefix, filename) => {
     console.log(`getting file ${filename} from api`);
     const authToken = await getAuthToken();
-    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${id}/${filename}`;
+    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${prefix}/${filename}`;
     const data = await fetch(url, {
         method: "get",
         headers: {
@@ -67,7 +67,7 @@ const getFile = async (id, filename) => {
     });
     console.log(data);
     if (data.status === 200) return data; // file contents
-    throw new Error(`request errored: ${data.status}`)
+    throw new Error(`request errored: ${data.status}`);
 };
 
 module.exports = { uploadFile, getFile };

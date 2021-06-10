@@ -10,6 +10,7 @@ module.exports = buildSchema(`
         make: String
         model: String
         license: String
+        files: [String!]
     }
 
     input VehicleInput {
@@ -27,6 +28,7 @@ module.exports = buildSchema(`
         color: String
         breed: String
         type: String
+        files: [String!]
     }
 
     input AnimalInput {

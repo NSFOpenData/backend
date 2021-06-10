@@ -11,6 +11,7 @@ const animalSchema = new Schema(
         color: String,
         breed: String,
         type: String,
+        files: [String],
     },
     {
         timestamps: true,
