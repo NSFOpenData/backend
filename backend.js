@@ -114,7 +114,7 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
         res.send(await file.buffer());
     } catch (error) {
         console.log(error);
-        throw error;
+        res.sendStatus(error);
     }
 });
 

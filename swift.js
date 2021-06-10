@@ -67,7 +67,7 @@ const getFile = async (prefix, filename) => {
     });
     console.log(data);
     if (data.status === 200) return data; // file contents
-    throw new Error(`request errored: ${data.status}`);
+    throw new Error(data.status);
 };
 
 module.exports = { uploadFile, getFile };
