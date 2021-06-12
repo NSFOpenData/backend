@@ -42,28 +42,28 @@ app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+const checkValidID = async (id, item) => {
+    item = item.toLowerCase();
+    const object = {
+        vehicle: Vehicle,
+        animal: Animal,
+    };
+    if (!Object.prototype.hasOwnProperty.call(object, item)) return false;
+
+    const found = await object[item].findByID(id);
+    console.log(found);
+    if (!found) return false;
+    return true;
+};
+
 app.post("/upload", upload.array("images"), async (req, res) => {
     let summary = "";
     let item = "";
     const { id, type } = req.body;
 
     // check valid id
-    switch (type.toLowerCase()) {
-        case "vehicle":
-            item = await Vehicle.findById(id);
-            console.log(item);
-            if (!item) res.status(404).send("no vehicle with that id found");
-            break;
-
-        case "animal":
-            item = Animal.findById(id);
-            if (!item) res.status(404).send("no animal with that id found");
-            break;
-
-        default:
-            res.send("Unknown type, please enter 'vehicle' or 'animal'.");
-    }
-    console.log(item);
+    item = await checkValidID(id, type);
+    if (!item) res.status(404).send(`no ${type} with that id found, type or id might be incorrect`);
 
     // do the uploads
     try {
@@ -92,21 +92,9 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
     const { type, id, filename } = req.params;
     console.log(`${filename} requested to be served`);
 
-    switch (type.toLowerCase()) {
-        case "vehicle": {
-            const item = Vehicle.findById(id);
-            if (!item) res.status(404).send("no vehicle with that id found");
-            break;
-        }
-        case "animal": {
-            const item = Animal.findById(id);
-            if (!item) res.status(404).send("no animal with that id found");
-            break;
-        }
-
-        default:
-            res.send("Unknown type, please enter 'vehicle' or 'animal'.");
-    }
+    // check valid id
+    const item = await checkValidID(id, type);
+    if (!item) res.status(404).send(`no ${type} with that id found, type or id might be incorrect`);
 
     try {
         const prefix = `${type}/${id}`;
