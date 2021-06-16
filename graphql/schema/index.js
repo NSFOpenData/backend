@@ -32,7 +32,7 @@ module.exports = buildSchema(`
     }
 
     input AnimalInput {
-        location: [String!]!
+        location: [String!]
         color: String
         breed: String
         type: String
@@ -64,6 +64,7 @@ module.exports = buildSchema(`
     type Query {
         vehicles: [Vehicle!]
         findVehicles(params: VehicleInput!): [Vehicle!]
+        findAnimals(params: AnimalInput!): [Animal!]
         animals: [Animal!]
         me: User
     }

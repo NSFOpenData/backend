@@ -30,6 +30,10 @@ module.exports = {
         return Animal.find();
     },
 
+    findAnimals: async ({ params }) => {
+        return Animal.find({ ...params });
+    },
+
     createAnimal: async ({ animal }) => {
         const animalDoc = new Animal(animal);
         const newAnimal = await animalDoc.save();
