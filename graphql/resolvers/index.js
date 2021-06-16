@@ -16,6 +16,10 @@ module.exports = {
         });
     },
 
+    findVehicles: async ({ params }) => {
+        return Vehicle.find({ ...params });
+    },
+
     createVehicle: async ({ vehicle }) => {
         const vehicleDoc = new Vehicle(vehicle);
         const newVehicle = await vehicleDoc.save();
