@@ -4,6 +4,6 @@ do these commands to install all dependencies, populate the db and start the bac
 
 ```
 npm i
-npm populate
+npm run populate
 npm start
 ```
