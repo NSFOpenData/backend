@@ -50,7 +50,7 @@ const checkValidID = async (id, item) => {
     };
     if (!Object.prototype.hasOwnProperty.call(object, item)) return false;
 
-    const found = await object[item].findByID(id);
+    const found = await object[item].findById(id);
     console.log(found);
     if (!found) return false;
     return true;
