@@ -17,7 +17,7 @@ module.exports = {
     },
 
     findVehicles: async ({ params }) => {
-        return Vehicle.find({ ...params });
+        return Vehicle.find(params);
     },
 
     createVehicle: async ({ vehicle }) => {
@@ -31,7 +31,7 @@ module.exports = {
     },
 
     findAnimals: async ({ params }) => {
-        return Animal.find({ ...params });
+        return Animal.find(params);
     },
 
     createAnimal: async ({ animal }) => {
@@ -50,8 +50,10 @@ module.exports = {
         console.log(email, user);
         const author = await User.findById(user.sub);
         if (!author || author.role !== "ADMIN") throw new Error("You are missing or have invalid credentials.");
+
         const found = await User.findOne({ email: email });
         if (!found) throw new Error("No user found for that email.");
+
         found.role = "PRIVILEGED";
         await found.save();
         return `${found.name} has been given access privileges.`;
@@ -81,8 +83,8 @@ module.exports = {
         return jwt.sign(
             {
                 "https://nsf-scc1.isis.vanderbilt.edu/graphql": {
-                    email: email,
-                    role: role,
+                    email,
+                    role,
                 },
             },
             process.env.JWT_SECRET,

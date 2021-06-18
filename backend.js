@@ -13,6 +13,7 @@ const multer = require("multer");
 const expressPlayground = require("graphql-playground-middleware-express").default; // for testing auth
 
 require("dotenv").config();
+const { DB, JWT_SECRET, NODE_ENV } = process.env;
 
 const app = express();
 
@@ -112,7 +113,7 @@ app.use(helmet());
 
 app.use(
     expressJWT({
-        secret: process.env.JWT_SECRET,
+        secret: JWT_SECRET,
         algorithms: ["HS256"],
         credentialsRequired: false,
     })
@@ -127,11 +128,11 @@ app.use(
     })
 );
 
-const uri = process.env.DB;
+const uri = DB;
 const options = { useNewUrlParser: true, useUnifiedTopology: true };
 mongoose
     .connect(uri, options)
-    .then(() => app.listen(3000, console.log("Server is running")))
+    .then(() => app.listen(3000, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
     .catch(error => {
         throw error;
     });
