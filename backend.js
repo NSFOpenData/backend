@@ -62,6 +62,8 @@ app.post("/upload", upload.array("images"), async (req, res) => {
     let item = "";
     const { id, type } = req.body;
 
+    if (!id || !type) res.status(400).send("both type and id fields required");
+
     // check valid id
     item = await checkValidID(id, type);
     if (!item) res.status(404).send(`no ${type} with that id found, type or id might be incorrect`);
