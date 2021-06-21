@@ -17,10 +17,10 @@ module.exports = {
     },
 
     findVehicles: async ({ params }) => {
-        console.log('findVehicles called');
+        console.log("findVehicles called");
         console.dir(params);
         // remove falsey properties
-        Object.keys(params).forEach((k) => params[k] == false && delete params[k]);
+        Object.keys(params).forEach(k => params[k] == false && delete params[k]);
         return Vehicle.find(params);
     },
 
@@ -35,10 +35,10 @@ module.exports = {
     },
 
     findAnimals: async ({ params }) => {
-        console.log('findAnimals called');
+        console.log("findAnimals called");
         console.dir(params);
         // remove falsey properties
-        Object.keys(params).forEach((k) => params[k] == false && delete params[k]);
+        Object.keys(params).forEach(k => params[k] == false && delete params[k]);
         return Animal.find(params);
     },
 
