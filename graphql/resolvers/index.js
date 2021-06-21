@@ -17,7 +17,8 @@ module.exports = {
     },
 
     findVehicles: async ({ params }) => {
-        console.log(`findVehicles called with ${params}`);
+        console.log('findVehicles called');
+        console.dir(params);
         return Vehicle.find(params);
     },
 
@@ -32,7 +33,8 @@ module.exports = {
     },
 
     findAnimals: async ({ params }) => {
-        console.log(`findAnimals called with ${params}`);
+        console.log('findAnimals called');
+        console.dir(params);
         return Animal.find(params);
     },
 
