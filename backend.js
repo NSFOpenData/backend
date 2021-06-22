@@ -1,5 +1,6 @@
 const express = require("express");
 const expressJWT = require("express-jwt");
+const Sentry = require("@sentry/node");
 const { graphqlHTTP } = require("express-graphql");
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolvers = require("./graphql/resolvers");
@@ -13,9 +14,13 @@ const multer = require("multer");
 const expressPlayground = require("graphql-playground-middleware-express").default; // for testing auth
 
 require("dotenv").config();
-const { DB, JWT_SECRET, NODE_ENV } = process.env;
+const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
+
+Sentry.init({ dsn: SENTRY_URL });
 
 const app = express();
+
+app.use(Sentry.Handlers.requestHandler());
 
 const html = `
 <!DOCTYPE html>
@@ -39,6 +44,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
+
+app.get("/debug-sentry", function mainHandler() {
+    throw new Error("My first Sentry error!");
+});
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -108,6 +117,8 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
         res.sendStatus(error);
     }
 });
+
+app.use(Sentry.Handlers.errorHandler());
 
 app.use(cors());
 
