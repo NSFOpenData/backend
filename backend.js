@@ -62,8 +62,7 @@ const checkValidID = async (id, item) => {
 
     const found = await object[item].findById(id);
     console.log(found);
-    if (!found) return false;
-    return true;
+    return found;
 };
 
 app.post("/upload", upload.array("images"), async (req, res) => {
