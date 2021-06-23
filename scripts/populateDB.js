@@ -51,7 +51,7 @@ function generator(entryMaker) {
 }
 
 const addEntries = async (col_name, entries) => {
-    const col = await client.db("test").collection(col_name);
+    const col = client.db("test").collection(col_name);
     console.log("Connected to DB");
 
     console.log(`Adding entries to the DB...`);

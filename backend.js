@@ -53,6 +53,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const checkValidID = async (id, item) => {
+    console.log(`checking valid id for id: ${id} and item: ${item}`);
     item = item.toLowerCase();
     const object = {
         vehicle: Vehicle,
