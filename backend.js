@@ -2,16 +2,19 @@ const express = require("express");
 const expressJWT = require("express-jwt");
 const Sentry = require("@sentry/node");
 const { graphqlHTTP } = require("express-graphql");
-const graphqlSchema = require("./graphql/schema");
-const graphqlResolvers = require("./graphql/resolvers");
-const { uploadFile, getFile } = require("./swift");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const Animal = require("./models/animal");
-const Vehicle = require("./models/vehicle");
 const helmet = require("helmet");
 const multer = require("multer");
 const expressPlayground = require("graphql-playground-middleware-express").default; // for testing auth
+const cors = require("cors");
+const mongoose = require("mongoose");
+
+const graphqlSchema = require("./graphql/schema");
+const graphqlResolvers = require("./graphql/resolvers");
+const { uploadFile, getFile } = require("./swift");
+const Animal = require("./models/animal");
+const Vehicle = require("./models/vehicle");
+
+
 
 require("dotenv").config();
 const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
