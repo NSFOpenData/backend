@@ -83,6 +83,10 @@ app.post("/upload", upload.array("images"), async (req, res) => {
         for (let file of req.files) {
             const { originalname: name, buffer } = file;
             const prefix = `${type}/${id}`;
+            if (item.files.includes(name)) {
+                summary += `file exists with name: ${prefix}/${name}, skipping... <br>`;
+                continue;
+            }
             const status = await uploadFile(prefix, name, buffer);
             if (status === 201) {
                 summary += `${prefix}/${name} created successfully<br>`;
