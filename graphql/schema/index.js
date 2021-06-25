@@ -38,6 +38,13 @@ module.exports = buildSchema(`
         type: String
     }
 
+    input AnimalSearchInput {
+        location: [String!]
+        color: [String!]
+        breed: String
+        type: String
+    }
+
     enum Role {
         ADMIN
         PRIVILEGED
@@ -64,7 +71,7 @@ module.exports = buildSchema(`
     type Query {
         vehicles: [Vehicle!]
         findVehicles(params: VehicleInput!): [Vehicle!]
-        findAnimals(params: AnimalInput!): [Animal!]
+        findAnimals(params: AnimalSearchInput!): [Animal!]
         animals: [Animal!]
         me: User
     }
