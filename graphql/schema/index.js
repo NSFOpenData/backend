@@ -2,10 +2,22 @@ const { buildSchema } = require("graphql");
 
 module.exports = buildSchema(`
 
+    type Location {
+        lat: String!
+        lon: String!
+        name: String
+    }
+
+    input LocationInput {
+        lat: String!
+        lon: String!
+        name: String
+    }
+
     type Vehicle {
         _id: ID!
         createdAt: Float!
-        location: [String!]!
+        location: Location!
         color: String
         make: String
         model: String
@@ -14,7 +26,7 @@ module.exports = buildSchema(`
     }
 
     input VehicleInput {
-        location: [String!]
+        location: LocationInput!
         color: String
         make: String
         model: String
@@ -24,7 +36,7 @@ module.exports = buildSchema(`
     type Animal {
         _id: ID!
         createdAt: Float!
-        location: [String!]!
+        location: Location!
         color: String
         breed: String
         type: String
@@ -32,17 +44,17 @@ module.exports = buildSchema(`
     }
 
     input AnimalInput {
-        location: [String!]
+        location: LocationInput!
         color: String
         breed: String
         type: String
     }
 
     input AnimalSearchInput {
-        location: [String!]
+        location: Location
         color: [String!]
-        breed: String
-        type: String
+        breed: [String!]
+        type: [String!]
     }
 
     enum Role {
