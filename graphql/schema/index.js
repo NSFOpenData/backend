@@ -51,7 +51,7 @@ module.exports = buildSchema(`
     }
 
     input AnimalSearchInput {
-        location: Location
+        location: LocationInput
         color: [String!]
         breed: [String!]
         type: [String!]

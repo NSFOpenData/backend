@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { getLocation } = require("../../utils");
 
 const Vehicle = require("../../models/vehicle");
 const Animal = require("../../models/animal");
@@ -25,6 +26,8 @@ module.exports = {
     },
 
     createVehicle: async ({ vehicle }) => {
+        const { lat, lon, name } = vehicle.location;
+        if (!name) vehicle.location.name = getLocation(lat, lon);
         const vehicleDoc = new Vehicle(vehicle);
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
@@ -43,6 +46,8 @@ module.exports = {
     },
 
     createAnimal: async ({ animal }) => {
+        const { lat, lon, name } = animal.location;
+        if (!name) animal.location.name = getLocation(lat, lon);
         const animalDoc = new Animal(animal);
         const newAnimal = await animalDoc.save();
         return newAnimal;
