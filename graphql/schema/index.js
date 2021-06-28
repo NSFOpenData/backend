@@ -33,6 +33,14 @@ module.exports = buildSchema(`
         license: String
     }
 
+    input VehicleSearchInput {
+        location: LocationInput
+        color: [String!]
+        make: [String!]
+        model: [String!]
+        license: [String!]
+    }
+
     type Animal {
         _id: ID!
         createdAt: Float!
@@ -82,7 +90,7 @@ module.exports = buildSchema(`
 
     type Query {
         vehicles: [Vehicle!]
-        findVehicles(params: VehicleInput!): [Vehicle!]
+        findVehicles(params: VehicleSearchInput!): [Vehicle!]
         findAnimals(params: AnimalSearchInput!): [Animal!]
         animals: [Animal!]
         me: User
