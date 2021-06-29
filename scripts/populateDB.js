@@ -10,13 +10,21 @@ const client = new MongoClient(url, {
 
 const NUM_ENTRIES = 50; // entries to make in db
 
+// generate fake locations around hardcoded vanderbilt coordinates
+function fakeLocation() {
+    return {
+        lat: `${36.14458208600954 + Math.random() * (-1 * (Math.random() > 0.5))}`,
+        lon: `${-86.80233323692445 + Math.random() * (-1 * (Math.random() > 0.5))}`,
+    };
+}
+
 function generateVehicleEntry() {
     let [make, ...model] = faker.vehicle.vehicle().split(" ");
     model = model.join(" ");
     return {
         _id: new ObjectID(),
         createdAt: faker.time.recent(),
-        location: faker.address.nearbyGPSCoordinate(),
+        location: fakeLocation(),
         color: faker.vehicle.color(),
         make: make,
         model: model,
@@ -34,7 +42,7 @@ function generateAnimalEntry() {
     return {
         _id: new ObjectID(),
         createdAt: faker.time.recent(),
-        location: faker.address.nearbyGPSCoordinate(),
+        location: fakeLocation(),
         color: faker.commerce.color(),
         breed: animals[animal](),
         type: animal,
@@ -63,7 +71,7 @@ module.exports = { addEntries };
 
 (async () => {
     await client.connect();
-    await addEntries("Vehicles", generator(generateVehicleEntry));
+    // await addEntries("Vehicles", generator(generateVehicleEntry));
     await addEntries("Animals", generator(generateAnimalEntry));
     process.exit(0);
 })();
