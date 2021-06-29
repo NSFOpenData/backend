@@ -71,7 +71,7 @@ module.exports = { addEntries };
 
 (async () => {
     await client.connect();
-    // await addEntries("Vehicles", generator(generateVehicleEntry));
+    await addEntries("Vehicles", generator(generateVehicleEntry));
     await addEntries("Animals", generator(generateAnimalEntry));
     process.exit(0);
 })();

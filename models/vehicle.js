@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
+const { locationSchema } = require("./location");
 
 const Schema = mongoose.Schema;
 
 const vehicleSchema = new Schema(
     {
         location: {
-            type: [String],
+            type: locationSchema,
             required: true,
         },
         color: String,
