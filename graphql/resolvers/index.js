@@ -27,7 +27,7 @@ module.exports = {
 
     createVehicle: async ({ vehicle }) => {
         const { lat, lon, name } = vehicle.location;
-        if (!name) vehicle.location.name = getLocation(lat, lon);
+        if (!name) vehicle.location.name = await getLocation(lat, lon);
         const vehicleDoc = new Vehicle(vehicle);
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
