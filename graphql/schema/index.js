@@ -79,6 +79,7 @@ module.exports = buildSchema(`
         createdAt: Float!
         name: String!
         email: String!
+        neighborhood: String
         role: Role!
     }
 
@@ -86,6 +87,7 @@ module.exports = buildSchema(`
         name: String!
         email: String!
         password: String!
+        neighborhood: String
     } 
 
     type Query {
