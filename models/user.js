@@ -7,7 +7,7 @@ const userSchema = new Schema(
         name: { type: String, required: true },
         email: { type: String, required: true },
         password: { type: String, required: true },
-        neighborhood: String,
+        neighborhood: { type: Schema.Types.ObjectId, required: true, ref: "Permissions" },
         role: {
             type: String,
             enum: ["USER", "ADMIN", "PRIVILEGED"],

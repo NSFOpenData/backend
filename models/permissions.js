@@ -14,4 +14,4 @@ const permissionSchema = new Schema(
     }
 );
 
-module.exports = mongoose.model("Permission", permissionSchema, "Permissions"); // specify collection name
+module.exports = mongoose.model("Permissions", permissionSchema, "Permissions"); // specify collection name
