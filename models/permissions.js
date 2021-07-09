@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const permissionSchema = new Schema(
     {
-        neighborhood: { type: String, required: true },
+        neighborhood: { type: String, required: true }, // neighborhood name
         readLicenseInfo: [String],
         writeData: [String],
         dataRetention: String,

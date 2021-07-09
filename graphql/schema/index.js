@@ -71,6 +71,18 @@ module.exports = buildSchema(`
         USER
     }
 
+    type Permissions {
+        readLicenseInfo: [Role!]
+        writeData: [Role!]
+    }
+
+    type Neighborhood {
+        _id = ID!
+        name: String!
+        dataRetention: String
+        permissions: Permissions!
+    }
+
     type User {
         """
         there will be a password field in db but it will not be queried
@@ -79,7 +91,7 @@ module.exports = buildSchema(`
         createdAt: Float!
         name: String!
         email: String!
-        neighborhood: String
+        neighborhood: Permissions!
         role: Role!
     }
 
@@ -104,6 +116,7 @@ module.exports = buildSchema(`
         register(user: RegistrationInput): User!
         login(email: String!, password: String!): String
         addPrivilege(email: String!): String
+        changePermissions
     }
 
     schema {
