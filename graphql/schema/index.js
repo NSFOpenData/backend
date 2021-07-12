@@ -83,7 +83,7 @@ module.exports = buildSchema(`
     }
 
     type Neighborhood {
-        _id = ID!
+        _id: ID!
         name: String!
         dataRetention: String
         permissions: Permissions!
@@ -122,7 +122,7 @@ module.exports = buildSchema(`
         register(user: RegistrationInput): User!
         login(email: String!, password: String!): String
         addPrivilege(email: String!): String
-        changePermissions
+        changePermissions(id: ID!): Neighborhood!
     }
 
     schema {
