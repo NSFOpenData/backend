@@ -5,6 +5,7 @@ const { getLocation } = require("../../utils");
 const Vehicle = require("../../models/vehicle");
 const Animal = require("../../models/animal");
 const User = require("../../models/user");
+const Neighborhood = require("../../models/neighborhood");
 
 module.exports = {
     vehicles: async (_, { user }) => {
@@ -33,6 +34,12 @@ module.exports = {
         const vehicleDoc = new Vehicle(vehicle);
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
+    },
+
+    createNeighborhood: async (args, { user }) => {
+        if (!user) throw new Error("authentication needed");
+        const neighborhoodDoc = new Neighborhood(args);
+        return neighborhoodDoc.save();
     },
 
     animals: async () => {

@@ -85,6 +85,7 @@ module.exports = buildSchema(`
     type Neighborhood {
         _id: ID!
         name: String!
+        location: Location!
         dataRetention: String
         permissions: Permissions!
     }
@@ -119,6 +120,7 @@ module.exports = buildSchema(`
     type Mutation {
         createVehicle(vehicle: VehicleInput): Vehicle
         createAnimal(animal: AnimalInput): Animal
+        createNeighborhood(name: String!, location: LocationInput!, dataRetention: String!): Neighborhood!
         register(user: RegistrationInput): User!
         login(email: String!, password: String!): String
         addPrivilege(email: String!): String
