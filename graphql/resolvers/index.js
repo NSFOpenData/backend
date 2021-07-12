@@ -99,7 +99,7 @@ module.exports = {
         const user = await User.findOne({ email: email });
         console.log("User logged in:", user, new Date());
         if (!user) throw new Error("User not found.");
-        const { id, password: dbPassword, role, neighborhood } = user;
+        const { id, password: dbPassword, role } = user;
 
         const valid = await bcrypt.compare(password, dbPassword);
         if (!valid) throw new Error("Invalid password.");
@@ -109,7 +109,6 @@ module.exports = {
                 "https://nsf-scc1.isis.vanderbilt.edu/graphql": {
                     email,
                     role,
-                    neighborhood: neighborhood.name,
                 },
             },
             process.env.JWT_SECRET,
