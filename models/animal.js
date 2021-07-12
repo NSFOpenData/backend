@@ -9,6 +9,7 @@ const animalSchema = new Schema(
             type: locationSchema,
             required: true,
         },
+        neighborhood: String,
         color: String,
         breed: String,
         type: String,

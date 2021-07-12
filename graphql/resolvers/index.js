@@ -25,9 +25,11 @@ module.exports = {
         return Vehicle.find(params);
     },
 
-    createVehicle: async ({ vehicle }) => {
+    createVehicle: async ({ vehicle }, { user }) => {
         const { lat, lon, name } = vehicle.location;
         if (!name) vehicle.location.name = await getLocation(lat, lon);
+        if (!vehicle.neighborhood)
+            vehicle.neighborhood = user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].neighborhood;
         const vehicleDoc = new Vehicle(vehicle);
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
@@ -45,9 +47,11 @@ module.exports = {
         return Animal.find(params);
     },
 
-    createAnimal: async ({ animal }) => {
+    createAnimal: async ({ animal }, { user }) => {
         const { lat, lon, name } = animal.location;
         if (!name) animal.location.name = getLocation(lat, lon);
+        if (!animal.neighborhood)
+            animal.neighborhood = user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].neighborhood;
         const animalDoc = new Animal(animal);
         const newAnimal = await animalDoc.save();
         return newAnimal;
@@ -88,7 +92,7 @@ module.exports = {
         const user = await User.findOne({ email: email });
         console.log("User logged in:", user, new Date());
         if (!user) throw new Error("User not found.");
-        const { id, password: dbPassword, role } = user;
+        const { id, password: dbPassword, role, neighborhood } = user;
 
         const valid = await bcrypt.compare(password, dbPassword);
         if (!valid) throw new Error("Invalid password.");
@@ -98,6 +102,7 @@ module.exports = {
                 "https://nsf-scc1.isis.vanderbilt.edu/graphql": {
                     email,
                     role,
+                    neighborhood: neighborhood.name,
                 },
             },
             process.env.JWT_SECRET,

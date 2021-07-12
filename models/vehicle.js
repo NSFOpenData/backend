@@ -9,6 +9,7 @@ const vehicleSchema = new Schema(
             type: locationSchema,
             required: true,
         },
+        neighborhood: String,
         color: String,
         make: String,
         model: String,

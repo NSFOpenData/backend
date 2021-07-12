@@ -18,6 +18,7 @@ module.exports = buildSchema(`
         _id: ID!
         createdAt: Float!
         location: Location!
+        neighborhood: String!
         color: String
         make: String
         model: String
@@ -27,6 +28,7 @@ module.exports = buildSchema(`
 
     input VehicleInput {
         location: LocationInput!
+        neighborhood: String
         color: String
         make: String
         model: String
@@ -35,6 +37,7 @@ module.exports = buildSchema(`
 
     input VehicleSearchInput {
         location: LocationInput
+        neighborhood: [String!]
         color: [String!]
         make: [String!]
         model: [String!]
@@ -45,6 +48,7 @@ module.exports = buildSchema(`
         _id: ID!
         createdAt: Float!
         location: Location!
+        neighborhood: String!
         color: String
         breed: String
         type: String
@@ -53,6 +57,7 @@ module.exports = buildSchema(`
 
     input AnimalInput {
         location: LocationInput!
+        neighborhood: String
         color: String
         breed: String
         type: String
@@ -60,6 +65,7 @@ module.exports = buildSchema(`
 
     input AnimalSearchInput {
         location: LocationInput
+        neighborhood: [String!]
         color: [String!]
         breed: [String!]
         type: [String!]
