@@ -72,6 +72,7 @@ module.exports = buildSchema(`
     }
 
     enum Role {
+        DEVELOPER   
         ADMIN
         PRIVILEGED
         USER

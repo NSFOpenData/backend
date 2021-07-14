@@ -10,7 +10,11 @@ const Neighborhood = require("../../models/neighborhood");
 
 module.exports = {
     vehicles: async (_, { user }) => {
-        const vehiclesFetched = await Vehicle.find();
+        if (!user) throw new Error("Authentication needed");
+        const { role, neighborhood } = user;
+        if (role === "DEVELOPER") return Vehicle.find();
+
+        const vehiclesFetched = await Vehicle.find({ neighborhood });
         return vehiclesFetched.map(vehicle => {
             // check if role has permissions
             if (!user || !["PRIVILEGED", "ADMIN"].includes(user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role))
@@ -19,8 +23,11 @@ module.exports = {
         });
     },
 
-    animals: async () => {
-        return Animal.find();
+    animals: async (_, { user }) => {
+        if (!user) throw new Error("Authentication needed");
+        const { role, neighborhood } = user;
+        if (role === "DEVELOPER") return Animal.find();
+        return Animal.find({ neighborhood });
     },
 
     neighborhoods: async () => {
@@ -98,22 +105,26 @@ module.exports = {
     },
 
     register: async args => {
-        const { name, email, password } = args.user;
+        const { name, email, password, neighborhood } = args.user;
+        const neighborhoodFound = Neighborhood.findOne({ name: neighborhood });
+        if (!neighborhoodFound) throw new Error(`Neighborhood with name ${neighborhood} not found`);
+
         const user = new User({
             name,
             email,
             password: await bcrypt.hash(password, 10),
             role: "USER",
+            neighborhood: neighborhoodFound.id,
         });
         const newUser = await user.save();
         return newUser;
     },
 
     login: async ({ email, password }) => {
-        const user = await User.findOne({ email: email });
+        const user = await User.findOne({ email: email }).populate("neighborhood");
         console.log("User logged in:", user, new Date());
         if (!user) throw new Error("User not found.");
-        const { id, password: dbPassword, role } = user;
+        const { id, password: dbPassword, role, neighborhood } = user;
 
         const valid = await bcrypt.compare(password, dbPassword);
         if (!valid) throw new Error("Invalid password.");
@@ -123,6 +134,7 @@ module.exports = {
                 "https://nsf-scc1.isis.vanderbilt.edu/graphql": {
                     email,
                     role,
+                    neighborhood: neighborhood.name,
                 },
             },
             process.env.JWT_SECRET,
