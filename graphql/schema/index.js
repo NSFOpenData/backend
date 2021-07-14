@@ -99,7 +99,7 @@ module.exports = buildSchema(`
         createdAt: Float!
         name: String!
         email: String!
-        neighborhood: Permissions!
+        neighborhood: Neighborhood!
         role: Role!
     }
 
