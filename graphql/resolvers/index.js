@@ -11,22 +11,22 @@ const Neighborhood = require("../../models/neighborhood");
 module.exports = {
     vehicles: async (_, { user }) => {
         if (!user) throw new Error("Authentication needed");
-        const { role, neighborhood } = user;
+        const { role, neighborhood } = user["https://nsf-scc1.isis.vanderbilt.edu/graphql"];
         if (role === "DEVELOPER") return Vehicle.find();
 
         const vehiclesFetched = await Vehicle.find({ neighborhood });
         return vehiclesFetched.map(vehicle => {
             // check if role has permissions
-            if (!user || !["PRIVILEGED", "ADMIN"].includes(user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role))
-                vehicle.license = null;
+            if (!user || !["PRIVILEGED", "ADMIN"].includes(role)) vehicle.license = null;
             return vehicle;
         });
     },
 
     animals: async (_, { user }) => {
         if (!user) throw new Error("Authentication needed");
-        const { role, neighborhood } = user;
+        const { role, neighborhood } = user["https://nsf-scc1.isis.vanderbilt.edu/graphql"];
         if (role === "DEVELOPER") return Animal.find();
+        console.log(neighborhood);
         return Animal.find({ neighborhood });
     },
 
