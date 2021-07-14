@@ -13,9 +13,17 @@ module.exports = {
         return vehiclesFetched.map(vehicle => {
             // check if role has permissions
             if (!user || !["PRIVILEGED", "ADMIN"].includes(user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role))
-                vehicle.license = null;
+            vehicle.license = null;
             return vehicle;
         });
+    },
+    
+    animals: async () => {
+        return Animal.find();
+    },
+
+    neighborhoods: async () => {
+        return Neighborhood.find();
     },
 
     findVehicles: async ({ params }) => {
@@ -40,10 +48,6 @@ module.exports = {
         if (!user) throw new Error("authentication needed");
         const neighborhoodDoc = new Neighborhood(args);
         return neighborhoodDoc.save();
-    },
-
-    animals: async () => {
-        return Animal.find();
     },
 
     findAnimals: async ({ params }) => {

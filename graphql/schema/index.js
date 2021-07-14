@@ -111,9 +111,10 @@ module.exports = buildSchema(`
 
     type Query {
         vehicles: [Vehicle!]
+        animals: [Animal!]
+        neighborhoods: [Neighborhood!]
         findVehicles(params: VehicleSearchInput!): [Vehicle!]
         findAnimals(params: AnimalSearchInput!): [Animal!]
-        animals: [Animal!]
         me: User
     }
 
