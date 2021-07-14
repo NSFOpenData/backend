@@ -113,6 +113,7 @@ module.exports = buildSchema(`
         vehicles: [Vehicle!]
         animals: [Animal!]
         neighborhoods: [Neighborhood!]
+        nearestNeighborhood(location: LocationInput!): Neighborhood
         findVehicles(params: VehicleSearchInput!): [Vehicle!]
         findAnimals(params: AnimalSearchInput!): [Animal!]
         me: User

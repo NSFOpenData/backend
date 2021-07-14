@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 
 const neighborhoodSchema = new Schema(
     {
-        name: { type: String, required: true }, // neighborhood name
+        name: { type: String, required: true, unique: true }, // neighborhood name
         location: locationSchema,
         dataRetention: String,
         permissions: permissionSchema,

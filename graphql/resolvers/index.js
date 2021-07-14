@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const geolib = require("geolib");
 const { getLocation } = require("../../utils");
 
 const Vehicle = require("../../models/vehicle");
@@ -13,11 +14,11 @@ module.exports = {
         return vehiclesFetched.map(vehicle => {
             // check if role has permissions
             if (!user || !["PRIVILEGED", "ADMIN"].includes(user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].role))
-            vehicle.license = null;
+                vehicle.license = null;
             return vehicle;
         });
     },
-    
+
     animals: async () => {
         return Animal.find();
     },
@@ -34,6 +35,23 @@ module.exports = {
         return Vehicle.find(params);
     },
 
+    findAnimals: async ({ params }) => {
+        console.log("findAnimals called");
+        console.dir(params);
+        // remove falsey properties
+        Object.keys(params).forEach(k => params[k] == false && delete params[k]);
+        return Animal.find(params);
+    },
+
+    nearestNeighborhood: async ({ location }) => {
+        const locations = await Neighborhood.find();
+        const points = locations.map(n => n.location); // create array of locations
+
+        const nearest = geolib.findNearest(location, points);
+        const neighborhood = locations.find(e => e.location === nearest);
+        return neighborhood;
+    },
+
     createVehicle: async ({ vehicle }, { user }) => {
         const { lat, lon, name } = vehicle.location;
         if (!name) vehicle.location.name = await getLocation(lat, lon);
@@ -48,14 +66,6 @@ module.exports = {
         if (!user) throw new Error("authentication needed");
         const neighborhoodDoc = new Neighborhood(args);
         return neighborhoodDoc.save();
-    },
-
-    findAnimals: async ({ params }) => {
-        console.log("findAnimals called");
-        console.dir(params);
-        // remove falsey properties
-        Object.keys(params).forEach(k => params[k] == false && delete params[k]);
-        return Animal.find(params);
     },
 
     createAnimal: async ({ animal }, { user }) => {
