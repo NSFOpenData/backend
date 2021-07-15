@@ -118,8 +118,8 @@ module.exports = {
             role: "USER",
             neighborhood: neighborhoodFound.id,
         });
-        const newUser = await user.save();
-        return await newUser.populate("neighborhood");
+        const newUser = await user.save().then(u => u.populate("neighborhood").execPopulate());
+        return newUser;
     },
 
     login: async ({ email, password }) => {
