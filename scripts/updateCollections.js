@@ -1,9 +1,10 @@
+// one off script to modify all entries of a collection
 const mongoose = require("mongoose");
 
-const Neighborhood = require("./models/neighborhood");
-const Vehicle = require("./models/vehicle");
-const Animal = require("./models/animal");
-const { animals } = require("./graphql/resolvers");
+const Neighborhood = require("../models/neighborhood");
+const Vehicle = require("../models/vehicle");
+const Animal = require("../models/animal");
+const { animals } = require("../graphql/resolvers");
 
 require("dotenv").config();
 const { DB } = process.env;
