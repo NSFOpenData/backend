@@ -106,7 +106,9 @@ module.exports = {
 
     register: async args => {
         const { name, email, password, neighborhood } = args.user;
-        const neighborhoodFound = Neighborhood.findOne({ name: neighborhood });
+        console.log(neighborhood);
+        const neighborhoodFound = await Neighborhood.findOne({ name: neighborhood });
+        console.log(neighborhoodFound);
         if (!neighborhoodFound) throw new Error(`Neighborhood with name ${neighborhood} not found`);
 
         const user = new User({
@@ -117,7 +119,7 @@ module.exports = {
             neighborhood: neighborhoodFound.id,
         });
         const newUser = await user.save();
-        return newUser;
+        return await newUser.populate("neighborhood");
     },
 
     login: async ({ email, password }) => {
