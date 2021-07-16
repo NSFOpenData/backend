@@ -77,7 +77,7 @@ module.exports = {
 
     createAnimal: async ({ animal }, { user }) => {
         const { lat, lon, name } = animal.location;
-        if (!name) animal.location.name = getLocation(lat, lon);
+        if (!name) animal.location.name = await getLocation(lat, lon);
         if (!animal.neighborhood)
             animal.neighborhood = user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].neighborhood;
         const animalDoc = new Animal(animal);
