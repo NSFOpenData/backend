@@ -8,6 +8,7 @@ const Animal = require("../models/animal");
 require("dotenv").config();
 const { DB } = process.env;
 
+// don't do this in prod tbh
 Array.prototype.random = function () {
     return this[Math.floor(Math.random() * this.length)];
 };
@@ -16,6 +17,7 @@ const updateCollection = async collection => {
     const neighborhoods = await Neighborhood.find().select("name");
     const choices = neighborhoods.map(n => n.name);
     const items = await collection.find();
+    // add a neighborhood field to each item
     items.forEach(async element => {
         element.neighborhood = choices.random();
         await element.save();
