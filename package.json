@@ -7,7 +7,7 @@
         "start": "node backend.js",
         "populate": "node scripts/populateDB.js",
         "prod": "env NODE_ENV=production npm start",
-        "format": "npx prettier -w **/*.js"
+        "fmt": "npx prettier -w **/*.js"
     },
     "repository": {
         "type": "git",

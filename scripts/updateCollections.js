@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const Neighborhood = require("../models/neighborhood");
 const Vehicle = require("../models/vehicle");
-const Animal = require("../models/animal");
+const { Animal } = require("../models/animal");
 
 require("dotenv").config();
 const { DB } = process.env;

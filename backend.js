@@ -11,7 +11,7 @@ const mongoose = require("mongoose");
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolvers = require("./graphql/resolvers");
 const { uploadFile, getFile } = require("./swift");
-const Animal = require("./models/animal");
+const { Animal } = require("./models/animal");
 const Vehicle = require("./models/vehicle");
 
 require("dotenv").config();

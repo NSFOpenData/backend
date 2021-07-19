@@ -4,14 +4,16 @@ const geolib = require("geolib");
 const { getLocation } = require("../../utils");
 
 const Vehicle = require("../../models/vehicle");
-const Animal = require("../../models/animal");
+const { Animal, PartialAnimal } = require("../../models/animal");
 const User = require("../../models/user");
 const Neighborhood = require("../../models/neighborhood");
+
+const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
 
 module.exports = {
     vehicles: async (_, { user }) => {
         if (!user) throw new Error("Authentication needed");
-        const { role, neighborhood } = user["https://nsf-scc1.isis.vanderbilt.edu/graphql"];
+        const { role, neighborhood } = user[DOMAIN];
         if (role === "DEVELOPER") return Vehicle.find();
 
         const vehiclesFetched = await Vehicle.find({ neighborhood });
@@ -24,7 +26,7 @@ module.exports = {
 
     animals: async (_, { user }) => {
         if (!user) throw new Error("Authentication needed");
-        const { role, neighborhood } = user["https://nsf-scc1.isis.vanderbilt.edu/graphql"];
+        const { role, neighborhood } = user[DOMAIN];
         if (role === "DEVELOPER") return Animal.find();
         console.log(neighborhood);
         return Animal.find({ neighborhood });
@@ -62,8 +64,7 @@ module.exports = {
     createVehicle: async ({ vehicle }, { user }) => {
         const { lat, lon, name } = vehicle.location;
         if (!name) vehicle.location.name = await getLocation(lat, lon);
-        if (!vehicle.neighborhood)
-            vehicle.neighborhood = user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].neighborhood;
+        if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
         const vehicleDoc = new Vehicle(vehicle);
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
@@ -78,11 +79,18 @@ module.exports = {
     createAnimal: async ({ animal }, { user }) => {
         const { lat, lon, name } = animal.location;
         if (!name) animal.location.name = await getLocation(lat, lon);
-        if (!animal.neighborhood)
-            animal.neighborhood = user["https://nsf-scc1.isis.vanderbilt.edu/graphql"].neighborhood;
+        if (!animal.neighborhood) animal.neighborhood = user[DOMAIN].neighborhood;
         const animalDoc = new Animal(animal);
         const newAnimal = await animalDoc.save();
         return newAnimal;
+    },
+
+    // to create descriptions that can be matched against to alert the user
+    createPartialAnimal: async ({ partial }, { user }) => {
+        if (!user) throw new Error("Authentication needed");
+        const { neighborhood } = user[DOMAIN];
+        const partialAnimal = new PartialAnimal({ createdBy: user.id, neighborhood, ...partial });
+        return partialAnimal.save();
     },
 
     me: async (_, { user }) => {
@@ -133,7 +141,7 @@ module.exports = {
 
         return jwt.sign(
             {
-                "https://nsf-scc1.isis.vanderbilt.edu/graphql": {
+                DOMAIN: {
                     email,
                     role,
                     neighborhood: neighborhood.name,

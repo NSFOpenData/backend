@@ -20,4 +20,20 @@ const animalSchema = new Schema(
     }
 );
 
-module.exports = mongoose.model("Animal", animalSchema, "Animals");
+const partialAnimalSchema = new Schema(
+    {
+        neighborhood: String,
+        color: String,
+        breed: String,
+        type: String,
+        createdBy: { type: Schema.Types.ObjectId, required: true, ref: "User" },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+module.exports = {
+    Animal: mongoose.model("Animal", animalSchema, "Animals"),
+    PartialAnimal: mongoose.model("PartialAnimal", partialAnimalSchema, "PartialAnimals"),
+};

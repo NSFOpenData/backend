@@ -71,6 +71,22 @@ module.exports = buildSchema(`
         type: [String!]
     }
 
+    type PartialAnimal {
+        _id: ID!
+        createdAt: Float!
+        neighborhood: String!
+        color: String!
+        breed: String!
+        type: String!
+        createdBy: User!
+    }
+
+    input PartialAnimalInput {
+        color: String!
+        breed: String!
+        type: String!
+    }
+
     enum Role {
         DEVELOPER   
         ADMIN
@@ -124,6 +140,7 @@ module.exports = buildSchema(`
         createVehicle(vehicle: VehicleInput): Vehicle
         createAnimal(animal: AnimalInput): Animal
         createNeighborhood(name: String!, location: LocationInput!, dataRetention: String!): Neighborhood!
+        createPartialAnimal(partial: PartialAnimalInput!): PartialAnimal!
         register(user: RegistrationInput): User!
         login(email: String!, password: String!): String
         addPrivilege(email: String!): String
