@@ -81,8 +81,15 @@ module.exports = {
         if (!name) animal.location.name = await getLocation(lat, lon);
         if (!animal.neighborhood) animal.neighborhood = user[DOMAIN].neighborhood;
 
-        const partial = await PartialAnimal.findOne(animal).populate("createdBy");
-        if (partial) console.log(partial.createdBy.email);
+        const { breed, color, type, neighborhood } = animal;
+        const partial = await PartialAnimal.findOne({
+            breed,
+            color,
+            type,
+            neighborhood,
+        }).populate("createdBy");
+
+        if (partial) console.log(`match for partial found: ${partial.createdBy.email}`);
 
         const animalDoc = new Animal(animal);
         const newAnimal = await animalDoc.save();
