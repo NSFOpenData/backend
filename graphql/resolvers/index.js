@@ -93,8 +93,8 @@ module.exports = {
     createPartialAnimal: async ({ partial }, { user }) => {
         if (!user) throw new Error("Authentication needed");
         const { neighborhood } = user[DOMAIN];
-        const partialAnimal = new PartialAnimal({ createdBy: user.id, neighborhood, ...partial });
-        return partialAnimal.save();
+        const partialAnimal = new PartialAnimal({ createdBy: user.sub, neighborhood, ...partial });
+        return partialAnimal.save().then(a => a.populate("createdBy").execPopulate());
     },
 
     me: async (_, { user }) => {
