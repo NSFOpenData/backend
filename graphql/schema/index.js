@@ -75,14 +75,14 @@ module.exports = buildSchema(`
         _id: ID!
         createdAt: Float!
         neighborhood: String!
-        color: String!
+        color: [String!]!
         breed: String!
         type: String!
         createdBy: User!
     }
 
     input PartialAnimalInput {
-        color: String!
+        color: [String!]!
         breed: String!
         type: String!
     }

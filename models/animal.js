@@ -23,7 +23,7 @@ const animalSchema = new Schema(
 const partialAnimalSchema = new Schema(
     {
         neighborhood: String,
-        color: String,
+        color: [String],
         breed: String,
         type: String,
         createdBy: { type: Schema.Types.ObjectId, required: true, ref: "User" },
