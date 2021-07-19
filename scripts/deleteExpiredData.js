@@ -19,20 +19,29 @@ const parseTimeString = timestring => {
     return number * modifier[duration];
 };
 
+async function processNeighborhood(n) {
+    const delta = parseTimeString(n.dataRetention);
+    const current = new Date();
+    // get current time - data retention time to check if object creation time is past it
+    const subtracted = new Date(current.getTime() - delta);
+
+    const deletedVehicles = await Vehicle.deleteMany({ neighborhood: n.name, createdAt: { $lte: subtracted } });
+    if (deletedVehicles.ok) console.log(`deleted ${deletedVehicles.deletedCount} vehicles`);
+    else console.log(`something went wrong, ${deletedVehicles}`);
+
+    const deletedAnimals = await Animal.deleteMany({
+        neighborhood: n.name,
+        createdAt: { $lte: subtracted },
+    });
+    if (deletedAnimals.ok) console.log(`deleted ${deletedAnimals.deletedCount} animals`);
+    else console.log(`something went wrong, ${deletedAnimals}`);
+}
+
 async function deleteData() {
     const neighborhoods = await Neighborhood.find();
-    neighborhoods.forEach(async n => {
-        const delta = parseTimeString(n.dataRetention);
-        const current = new Date();
-        // get current time - data retention time to check if object creation time is past it
-        const subtracted = new Date(current.getTime() - delta);
-
-        const deletedVehicles = await Vehicle.deleteMany({ neighborhood: n.name, createdAt: { $lte: subtracted } });
-        if (deletedVehicles.ok) console.log(`deleted ${deletedVehicles.deletedCount} vehicles`);
-
-        const deletedAnimals = await Animal.deleteMany({ neighborhood: n.name, createdAt: { $lte: subtracted } });
-        if (deletedAnimals.ok) console.log(`deleted ${deletedAnimals.deletedCount} animals`);
-    });
+    let promises = [];
+    neighborhoods.forEach(async n => promises.push(processNeighborhood(n)));
+    await Promise.all(promises);
 }
 
 const uri = DB;
