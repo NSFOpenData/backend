@@ -44,6 +44,24 @@ module.exports = buildSchema(`
         license: [String!]
     }
 
+    type PartialVehicle {
+        _id: ID!
+        createdAt: Float!
+        neighborhood: String!
+        color: [String!]!
+        make: String!
+        model: String!
+        license: String
+        createdBy: User!
+    }
+
+    input PartialVehicleInput {
+        color: [String!]!
+        make: String!
+        model: String!
+        license: String
+    }
+
     type Animal {
         _id: ID!
         createdAt: Float!
@@ -141,6 +159,7 @@ module.exports = buildSchema(`
         createAnimal(animal: AnimalInput): Animal
         createNeighborhood(name: String!, location: LocationInput!, dataRetention: String!): Neighborhood!
         createPartialAnimal(partial: PartialAnimalInput!): PartialAnimal!
+        createPartialVehicle(partial: PartialVehicleInput!): PartialVehicle!
         register(user: RegistrationInput): User!
         login(email: String!, password: String!): String
         addPrivilege(email: String!): String

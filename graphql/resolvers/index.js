@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const geolib = require("geolib");
 const { getLocation } = require("../../utils");
 
-const Vehicle = require("../../models/vehicle");
+const { Vehicle, PartialVehicle } = require("../../models/vehicle");
 const { Animal, PartialAnimal } = require("../../models/animal");
 const User = require("../../models/user");
 const Neighborhood = require("../../models/neighborhood");
@@ -65,9 +65,29 @@ module.exports = {
         const { lat, lon, name } = vehicle.location;
         if (!name) vehicle.location.name = await getLocation(lat, lon);
         if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
+
+        const { color, make, model, license, neighborhood } = vehicle;
+        const partial = await PartialAnimal.find({
+            color,
+            make,
+            model,
+            ...(license && { license }), // include license only if supplied
+            neighborhood,
+        }).populate("createdBy");
+
+        if (partial.length) partial.forEach(p => console.log(`match for partial found: ${p.createdBy.email}`));
+
         const vehicleDoc = new Vehicle(vehicle);
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
+    },
+
+    createPartialVehicle: async ({ partial }, { user }) => {
+        if (!user) throw new Error("Authentication needed");
+        const { neighborhood, role } = user[DOMAIN];
+        if (role === "USER") throw new Error("Need to be at least a privileged user.");
+        const partialVehicle = new PartialVehicle({ createdBy: user.sub, neighborhood, ...partial });
+        return partialVehicle.save().then(a => a.populate("createdBy").execPopulate());
     },
 
     createNeighborhood: async (args, { user }) => {
@@ -82,14 +102,14 @@ module.exports = {
         if (!animal.neighborhood) animal.neighborhood = user[DOMAIN].neighborhood;
 
         const { breed, color, type, neighborhood } = animal;
-        const partial = await PartialAnimal.findOne({
+        const partial = await PartialAnimal.find({
             breed,
             color,
             type,
             neighborhood,
         }).populate("createdBy");
 
-        if (partial) console.log(`match for partial found: ${partial.createdBy.email}`);
+        if (partial.length) partial.forEach(p => console.log(`match for partial found: ${p.createdBy.email}`));
 
         const animalDoc = new Animal(animal);
         const newAnimal = await animalDoc.save();

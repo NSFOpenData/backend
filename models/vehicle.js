@@ -21,4 +21,21 @@ const vehicleSchema = new Schema(
     }
 );
 
-module.exports = mongoose.model("Vehicle", vehicleSchema, "Vehicles"); // specify collection name
+const partialVehicleSchema = new Schema(
+    {
+        neighborhood: String,
+        color: [String],
+        make: String,
+        model: String,
+        license: String,
+        createdBy: { type: Schema.Types.ObjectId, required: true, ref: "User" },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+module.exports = {
+    Vehicle: mongoose.model("Vehicle", vehicleSchema, "Vehicles"),
+    PartialVehicle: mongoose.model("PartialVehicle", partialVehicleSchema, "PartialVehicles"),
+};

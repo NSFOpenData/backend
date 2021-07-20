@@ -12,7 +12,7 @@ const graphqlSchema = require("./graphql/schema");
 const graphqlResolvers = require("./graphql/resolvers");
 const { uploadFile, getFile } = require("./swift");
 const { Animal } = require("./models/animal");
-const Vehicle = require("./models/vehicle");
+const { Vehicle } = require("./models/vehicle");
 
 require("dotenv").config();
 const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
