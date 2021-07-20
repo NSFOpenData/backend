@@ -179,7 +179,7 @@ module.exports = {
 
         return jwt.sign(
             {
-                "https://nsf-scc1.isis.vanderbilt.edu/graphql": {
+                [DOMAIN]: {
                     email,
                     role,
                     neighborhood: neighborhood.name,
