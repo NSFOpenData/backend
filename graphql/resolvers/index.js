@@ -122,6 +122,7 @@ module.exports = {
     // to create descriptions that can be matched against to alert the user
     createPartialAnimal: async ({ partial }, { user }) => {
         if (!user) throw new Error("Authentication needed");
+        console.log(user);
         const { neighborhood } = user[DOMAIN];
         const partialAnimalDoc = new PartialAnimal({ createdBy: user.sub, neighborhood, ...partial });
         console.log(partialAnimalDoc);
@@ -178,7 +179,7 @@ module.exports = {
 
         return jwt.sign(
             {
-                DOMAIN: {
+                "https://nsf-scc1.isis.vanderbilt.edu/graphql": {
                     email,
                     role,
                     neighborhood: neighborhood.name,
