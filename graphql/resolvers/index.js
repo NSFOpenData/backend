@@ -87,6 +87,7 @@ module.exports = {
         const { neighborhood, role } = user[DOMAIN];
         if (role === "USER") throw new Error("Need to be at least a privileged user.");
         const partialVehicleDoc = new PartialVehicle({ createdBy: user.sub, neighborhood, ...partial });
+        console.log(partialVehicleDoc);
         const partialVehicle = await partialVehicleDoc.save().then(a => a.populate("createdBy").execPopulate());
         console.log("created partial vehicle description", partialVehicle);
         return partialVehicle;
@@ -123,6 +124,7 @@ module.exports = {
         if (!user) throw new Error("Authentication needed");
         const { neighborhood } = user[DOMAIN];
         const partialAnimalDoc = new PartialAnimal({ createdBy: user.sub, neighborhood, ...partial });
+        console.log(partialAnimalDoc);
         const partialAnimal = await partialAnimalDoc.save().then(a => a.populate("createdBy").execPopulate());
         console.log("created partial animal description", partialAnimal);
         return partialAnimal;
