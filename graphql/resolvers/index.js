@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const geolib = require("geolib");
-const { getLocation } = require("../../utils");
+const { getLocation, sendEmail, makeBody } = require("../../utils");
 
 const { Vehicle, PartialVehicle } = require("../../models/vehicle");
 const { Animal, PartialAnimal } = require("../../models/animal");
@@ -75,9 +75,13 @@ module.exports = {
             neighborhood,
         }).populate("createdBy");
 
-        if (partial.length) partial.forEach(p => console.log(`match for partial found: ${p.createdBy.email}`));
-
         const vehicleDoc = new Vehicle(vehicle);
+        if (partial.length)
+            partial.forEach(p => {
+                console.log(`match for partial found: ${p.createdBy.email}`);
+                sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", makeBody(vehicleDoc));
+            });
+
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
     },
@@ -112,9 +116,14 @@ module.exports = {
             neighborhood,
         }).populate("createdBy");
 
-        if (partial.length) partial.forEach(p => console.log(`match for partial found: ${p.createdBy.email}`));
-
         const animalDoc = new Animal(animal);
+
+        if (partial.length)
+            partial.forEach(p => {
+                console.log(`match for partial found: ${p.createdBy.email}`);
+                sendEmail(p.createdBy.email, "Animal hotlist description matched.", makeBody(animalDoc));
+            });
+
         const newAnimal = await animalDoc.save();
         return newAnimal;
     },
