@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 const makeBody = item => {
     const model = item.constructor.modelName; // check if Animal or Vehicle
     const article = model === "Animal" ? "An" : "A";
-    return `<p>${article} ${model} matching your description has been found with the following details:</p><br>${item}`;
+    return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>${item}</p>`;
 };
 
 const sendEmail = (recipient, subject, bodyHtml) => {
