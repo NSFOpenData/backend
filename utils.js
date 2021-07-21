@@ -3,6 +3,11 @@ const nodemailer = require("nodemailer");
 
 const makeBody = item => {
     const model = item.constructor.modelName; // check if Animal or Vehicle
+    // strip items for inclusion in email
+    delete item.id;
+    delete item.files;
+    delete item.location.id;
+
     const article = model === "Animal" ? "An" : "A";
     return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>${item}</p>`;
 };
