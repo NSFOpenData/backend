@@ -186,7 +186,7 @@ module.exports = {
         const valid = await bcrypt.compare(password, dbPassword);
         if (!valid) throw new Error("Invalid password.");
 
-        return jwt.sign(
+        const token = jwt.sign(
             {
                 [DOMAIN]: {
                     email,
@@ -201,5 +201,6 @@ module.exports = {
                 expiresIn: "7d",
             }
         );
+        return { token, user };
     },
 };

@@ -144,6 +144,11 @@ module.exports = buildSchema(`
         neighborhood: String
     } 
 
+    type LoginPayload {
+        token: String!
+        user: User!
+    }
+
     type Query {
         vehicles: [Vehicle!]
         animals: [Animal!]
@@ -161,7 +166,7 @@ module.exports = buildSchema(`
         createPartialAnimal(partial: PartialAnimalInput!): PartialAnimal!
         createPartialVehicle(partial: PartialVehicleInput!): PartialVehicle!
         register(user: RegistrationInput): User!
-        login(email: String!, password: String!): String
+        login(email: String!, password: String!): LoginPayload!
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
     }
