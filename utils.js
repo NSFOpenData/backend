@@ -3,14 +3,13 @@ const nodemailer = require("nodemailer");
 
 const makeBody = item => {
     const model = item.constructor.modelName; // check if Animal or Vehicle
-    // strip fields that have no use in email
-    delete item.id;
-    delete item.files;
-    delete item.location.id;
-    console.log(item);
+    console.log(delete item["files"]);
+    console.log(delete item["_id"]);
+    const { location, ...rest } = item;
+    const locationURL = `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lon}`;
 
     const article = model === "Animal" ? "An" : "A";
-    return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>${item}</p>`;
+    return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>Location: ${locationURL}</p><br><p>${rest}</p>`;
 };
 
 const sendEmail = (recipient, subject, bodyHtml) => {
