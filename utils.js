@@ -1,7 +1,8 @@
 const fetch = require("node-fetch");
 const nodemailer = require("nodemailer");
 
-const makeBody = item => {
+const makeBody = obj => {
+    let item = { ...obj }; // objects are passed by ref in js so we make a copy
     const model = item.constructor.modelName; // check if Animal or Vehicle
     console.log(delete item._doc.files);
     console.log(delete item._doc._id);
