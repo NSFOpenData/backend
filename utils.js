@@ -5,13 +5,12 @@ const makeBody = item => {
     const model = item.constructor.modelName; // check if Animal or Vehicle
     console.log(delete item["files"]);
     console.log(delete item["_id"]);
-    const { location, ...rest } = item;
+    const { location } = item;
     const locationURL = "https://www.google.com/maps/search/?api=1&query=" + location.lat + "," + location.lon;
 
+    console.log(delete item["location"]);
     const article = model === "Animal" ? "An" : "A";
-    return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>Location: ${locationURL}</p><br><p>${JSON.stringify(
-        rest
-    )}</p>`;
+    return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>Location: ${locationURL}</p><br><p>${item}</p>`;
 };
 
 const sendEmail = (recipient, subject, bodyHtml) => {

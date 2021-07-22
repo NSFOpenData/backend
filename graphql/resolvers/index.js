@@ -1,7 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const geolib = require("geolib");
-const { getLocation, sendEmail, makeBody } = require("../../utils");
+const { GraphQLUpload } = require("graphql-upload");
+const { getLocation, uploadFile, sendEmail, makeBody } = require("../../utils");
 
 const { Vehicle, PartialVehicle } = require("../../models/vehicle");
 const { Animal, PartialAnimal } = require("../../models/animal");
@@ -11,6 +12,8 @@ const Neighborhood = require("../../models/neighborhood");
 const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
 
 module.exports = {
+    Upload: GraphQLUpload,
+
     vehicles: async (_, { user }) => {
         if (!user) throw new Error("Authentication needed");
         const { role, neighborhood } = user[DOMAIN];
@@ -108,13 +111,26 @@ module.exports = {
         if (!name) animal.location.name = await getLocation(lat, lon);
         if (!animal.neighborhood) animal.neighborhood = user[DOMAIN].neighborhood;
 
-        const { breed, color, type, neighborhood } = animal;
+        const { breed, color, type, neighborhood, files, id } = animal;
         const partial = await PartialAnimal.find({
             breed,
             color,
             type,
             neighborhood,
         }).populate("createdBy");
+
+        if (files) {
+            animal.files = [];
+            for (let file of files) {
+                const { filename: name, createReadStream } = file;
+                const prefix = `${type}/${id}`;
+                const status = await uploadFile(prefix, name, createReadStream());
+                if (status === 201) {
+                    console.log(`${prefix}/${name} created successfully`);
+                    animal.files.push(name);
+                } else console.log(`${name} bugged with status ${status}\n`);
+            }
+        }
 
         const animalDoc = new Animal(animal);
 

@@ -2,6 +2,8 @@ const { buildSchema } = require("graphql");
 
 module.exports = buildSchema(`
 
+    scalar Upload 
+    
     type Location {
         lat: String!
         lon: String!
@@ -79,6 +81,7 @@ module.exports = buildSchema(`
         color: String
         breed: String
         type: String
+        files: [Upload!]
     }
 
     input AnimalSearchInput {
