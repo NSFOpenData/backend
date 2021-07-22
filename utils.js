@@ -6,6 +6,8 @@ const makeBody = item => {
     console.log(delete item["files"]);
     console.log(delete item["_id"]);
     const { location } = item;
+    console.log(location.lat);
+    console.log(location.lon);
     const locationURL = "https://www.google.com/maps/search/?api=1&query=" + location.lat + "," + location.lon;
 
     console.log(delete item["location"]);
