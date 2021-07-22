@@ -6,10 +6,12 @@ const makeBody = item => {
     console.log(delete item["files"]);
     console.log(delete item["_id"]);
     const { location, ...rest } = item;
-    const locationURL = `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lon}`;
+    const locationURL = "https://www.google.com/maps/search/?api=1&query=" + location.lat + "," + location.lon;
 
     const article = model === "Animal" ? "An" : "A";
-    return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>Location: ${locationURL}</p><br><p>${rest}</p>`;
+    return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>Location: ${locationURL}</p><br><p>${JSON.stringify(
+        rest
+    )}</p>`;
 };
 
 const sendEmail = (recipient, subject, bodyHtml) => {
