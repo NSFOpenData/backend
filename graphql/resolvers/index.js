@@ -126,9 +126,9 @@ module.exports = {
         if (files) {
             animal.files = [];
             for (let file of files) {
-                console.log("this is a file", file);
+                console.log("this is a file", file); // logging this shows file has a file object
                 const { filename: name, stream } = file;
-                const prefix = `{type}/${animalDoc._doc_._id}`;
+                const prefix = `{type}/${animalDoc._doc._id}`;
                 const status = await uploadFile(prefix, name, stream);
                 if (status === 201) {
                     console.log(`${prefix}/${name} created successfully`);
