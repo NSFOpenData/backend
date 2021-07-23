@@ -21,7 +21,7 @@ const makeBody = obj => {
 };
 
 /**
- *
+ * Send email to
  * @param {String} recipient
  * @param {String} subject
  * @param {String} bodyHtml

@@ -2,7 +2,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const geolib = require("geolib");
 const { GraphQLUpload } = require("graphql-upload");
-const { getLocation, uploadFile, sendEmail, makeBody } = require("../../utils");
+const { getLocation, sendEmail, makeBody } = require("../../utils");
+const { uploadFile } = require("../../swift");
 
 const { Vehicle, PartialVehicle } = require("../../models/vehicle");
 const { Animal, PartialAnimal } = require("../../models/animal");
