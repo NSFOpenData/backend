@@ -1,6 +1,11 @@
 const fetch = require("node-fetch");
 const nodemailer = require("nodemailer");
 
+/**
+ * Create html body to send in emails
+ * @param {*} obj Animal or Vehicle object to get info from
+ * @returns formatted html string email body
+ */
 const makeBody = obj => {
     let item = { ...obj }; // objects are passed by ref in js so we make a copy
     const model = item.constructor.modelName; // check if Animal or Vehicle
@@ -15,13 +20,19 @@ const makeBody = obj => {
     return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>Location: ${locationURL}</p><br><p>${item}</p>`;
 };
 
+/**
+ *
+ * @param {String} recipient
+ * @param {String} subject
+ * @param {String} bodyHtml
+ */
 const sendEmail = (recipient, subject, bodyHtml) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.isis.vanderbilt.edu",
         port: 25,
         secure: false,
         tls: {
-            rejectUnauthorized: false,
+            rejectUnauthorized: false, // https://stackoverflow.com/a/46752426/9044659
         },
     });
 
