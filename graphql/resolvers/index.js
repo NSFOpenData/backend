@@ -122,9 +122,11 @@ module.exports = {
         if (files) {
             animal.files = [];
             for (let file of files) {
+                console.log(file);
                 const { filename: name, createReadStream } = file;
+                const buffer = createReadStream();
                 const prefix = `${type}/${id}`;
-                const status = await uploadFile(prefix, name, createReadStream());
+                const status = await uploadFile(prefix, name, buffer);
                 if (status === 201) {
                     console.log(`${prefix}/${name} created successfully`);
                     animal.files.push(name);
