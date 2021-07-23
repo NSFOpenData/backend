@@ -112,7 +112,7 @@ module.exports = {
         if (!name) animal.location.name = await getLocation(lat, lon);
         if (!animal.neighborhood) animal.neighborhood = user[DOMAIN].neighborhood;
 
-        const { breed, color, type, neighborhood, files, id } = animal;
+        const { breed, color, type, neighborhood, files } = animal;
         const partial = await PartialAnimal.find({
             breed,
             color,
@@ -120,13 +120,15 @@ module.exports = {
             neighborhood,
         }).populate("createdBy");
 
+        const animalDoc = new Animal(animal);
+
         console.log(files);
         if (files) {
             animal.files = [];
             for (let file of files) {
-                console.log(file);
+                console.log("this is a file", file);
                 const { filename: name, stream } = file;
-                const prefix = `${type}/${id}`;
+                const prefix = `{type}/${animalDoc._doc_._id}`;
                 const status = await uploadFile(prefix, name, stream);
                 if (status === 201) {
                     console.log(`${prefix}/${name} created successfully`);
@@ -134,8 +136,6 @@ module.exports = {
                 } else console.log(`${name} bugged with status ${status}\n`);
             }
         }
-
-        const animalDoc = new Animal(animal);
 
         if (partial.length)
             partial.forEach(p => {
