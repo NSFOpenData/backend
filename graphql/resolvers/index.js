@@ -119,6 +119,7 @@ module.exports = {
             neighborhood,
         }).populate("createdBy");
 
+        console.log(files);
         if (files) {
             animal.files = [];
             for (let file of files) {
