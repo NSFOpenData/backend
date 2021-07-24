@@ -3,9 +3,14 @@ require("dotenv").config();
 
 const { SWIFT_USER, SWIFT_PASSWORD } = process.env;
 
+// global variables to store tokens and expiry at
 let token = "";
 let expiry = "";
 
+/**
+ *
+ * @returns an auth token, either reused or a new generated one if old one expired
+ */
 const getAuthToken = async () => {
     // reuse token if not expired
     if (expiry && new Date() < new Date(expiry)) return token;
@@ -40,6 +45,13 @@ const getAuthToken = async () => {
         });
 };
 
+/**
+ * uploads given file to the swift cluster
+ * @param {String} prefix the prefix to namespace the file by
+ * @param {String} filename original name of the file
+ * @param {*} stream the buffer contents of the file
+ * @returns status code of the request
+ */
 const uploadFile = async (prefix, filename, stream) => {
     const authToken = await getAuthToken();
     const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${prefix}/${filename}`;
@@ -55,6 +67,12 @@ const uploadFile = async (prefix, filename, stream) => {
     return data.status;
 };
 
+/**
+ * Retrieve a file from the swift cluster
+ * @param {String} prefix the prefix the file is stored under
+ * @param {String} filename the name of the file to retrieve
+ * @returns file contents
+ */
 const getFile = async (prefix, filename) => {
     console.log(`getting file ${filename} from api`);
     const authToken = await getAuthToken();

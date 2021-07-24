@@ -54,13 +54,21 @@ app.get("/debug-sentry", function mainHandler() {
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+/**
+ * validate if item with given id exists, used in uploads and downloads of files
+ * @param {String} id the id of item to check
+ * @param {String} item animal / vehicle to fetch the object from
+ * @returns the object if found else null
+ */
 const checkValidID = async (id, item) => {
     console.log(`checking valid id for id: ${id} and item: ${item}`);
     item = item.toLowerCase();
+    // map to the database model
     const object = {
         vehicle: Vehicle,
         animal: Animal,
     };
+    // check if it is in the object
     if (!Object.prototype.hasOwnProperty.call(object, item)) return false;
 
     const found = await object[item].findById(id);
@@ -95,10 +103,11 @@ app.post("/upload", upload.array("images"), async (req, res) => {
                 uploads.push(name);
             } else summary += `${name} bugged with status ${status}\n`;
         }
+        // update the files field in the object
         if (item.files) item.files.push(...uploads);
         else item.files = uploads;
         console.log(item);
-        await item.save(); // update db object
+        await item.save();
     } catch (error) {
         console.log(error);
         throw error;
@@ -106,6 +115,7 @@ app.post("/upload", upload.array("images"), async (req, res) => {
     return res.send(summary);
 });
 
+// endpoint to get images from the server
 app.get("/file/:type/:id/:filename", async (req, res) => {
     const { type, id, filename } = req.params;
     console.log(`${filename} requested to be served`);

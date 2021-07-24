@@ -21,10 +21,10 @@ const makeBody = obj => {
 };
 
 /**
- * Send email to
- * @param {String} recipient
- * @param {String} subject
- * @param {String} bodyHtml
+ * Send email to user
+ * @param {String} recipient email of the user
+ * @param {String} subject the email subject
+ * @param {String} bodyHtml html body
  */
 const sendEmail = (recipient, subject, bodyHtml) => {
     const transporter = nodemailer.createTransport({
@@ -53,6 +53,12 @@ const sendEmail = (recipient, subject, bodyHtml) => {
     );
 };
 
+/**
+ * reverse coordinate lookup to figure out an approximate street
+ * @param {*} lat latitude of coordinate
+ * @param {*} lon longitude of coordinate
+ * @returns the street from the lookup
+ */
 const getLocation = (lat, lon) => {
     const url = "https://nominatim.openstreetmap.org/reverse?";
     const params = new URLSearchParams({
