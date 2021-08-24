@@ -71,7 +71,7 @@ module.exports = {
         if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
 
         const { color, make, model, license, neighborhood } = vehicle;
-        const partial = await PartialAnimal.find({
+        const partial = await PartialVehicle.find({
             color,
             make,
             model,
