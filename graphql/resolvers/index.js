@@ -76,7 +76,6 @@ module.exports = {
             make,
             model,
             ...(license && { license }), // include license only if supplied
-            neighborhood,
         }).populate("createdBy");
 
         const vehicleDoc = new Vehicle(vehicle);
