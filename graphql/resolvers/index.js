@@ -72,6 +72,7 @@ module.exports = {
 
         const { color, make, model, license, neighborhood } = vehicle;
         const partial = await PartialVehicle.find({
+            neighborhood,
             color,
             make,
             model,
@@ -81,10 +82,8 @@ module.exports = {
         const vehicleDoc = new Vehicle(vehicle);
         if (partial.length)
             partial.forEach(p => {
-                console.log(`match for partial found: ${p.createdBy.email}`);
                 sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", makeBody(vehicleDoc));
             });
-
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
     },
@@ -94,9 +93,8 @@ module.exports = {
         const { neighborhood, role } = user[DOMAIN];
         if (role === "USER") throw new Error("Need to be at least a privileged user.");
         const partialVehicleDoc = new PartialVehicle({ createdBy: user.sub, neighborhood, ...partial });
-        console.log(partialVehicleDoc);
         const partialVehicle = await partialVehicleDoc.save().then(a => a.populate("createdBy").execPopulate());
-        console.log("created partial vehicle description", partialVehicle);
+
         return partialVehicle;
     },
 
