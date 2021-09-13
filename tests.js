@@ -2,7 +2,7 @@ const { addEntries } = require("./populateDB")
 
 const objs = [{
   _id: "test",
-  createdAt: 123456789,
+  time: 123456,
   msg: "this is a test",
 }];
 
