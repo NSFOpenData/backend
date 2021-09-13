@@ -9,13 +9,11 @@ const nodemailer = require("nodemailer");
 const makeBody = obj => {
     let item = { ...obj }; // objects are passed by ref in js so we make a copy
     const model = item.constructor.modelName; // check if Animal or Vehicle
-    console.log(delete item._doc.files);
-    console.log(delete item._doc._id);
-    const { location } = item;
-    const locationURL = "https://www.google.com/maps/search/?api=1&query=" + location.lat + "," + location.lon;
+    // console.log(delete item._doc.files);
+    // console.log(delete item._doc._id);
+    // const { location } = item._doc.location;
+    const locationURL = "https://www.google.com/maps/search/?api=1&query=" + item._doc.location.lat + "," + item._doc.location.lon;
 
-    console.log(delete item._doc.location);
-    console.log(item);
     const article = model === "Animal" ? "An" : "A";
     return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>Location: ${locationURL}</p><br><p>${item}</p>`;
 };
