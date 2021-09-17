@@ -1,4 +1,3 @@
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const geolib = require("geolib");
 const { GraphQLUpload } = require("graphql-upload");
@@ -9,8 +8,28 @@ const { Vehicle, PartialVehicle } = require("../../models/vehicle");
 const { Animal, PartialAnimal } = require("../../models/animal");
 const User = require("../../models/user");
 const Neighborhood = require("../../models/neighborhood");
+var admin = require("firebase-admin");
 
 const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
+
+// import { initializeApp } from 'firebase/app';
+// import {getAuth } from 'firebase/auth';
+// import {getFirestore } from 'firebase/firestore';
+
+// const firebaseApp = initializeApp({
+//     apiKey: "AIzaSyBdtgJTpg8-pYIb7sMny70qeJICM-fiSqY",
+//     authDomain: "nsfopendata.firebaseapp.com",
+//     projectId: "nsfopendata",
+//     storageBucket: "nsfopendata.appspot.com",
+//     messagingSenderId: "534112304877",
+//     appId: "1:534112304877:web:82adc6a18d014a931cd6e4",
+//     measurementId: "G-67PGJ786CW"
+// });
+
+// const auth = getAuth(firebaseApp);
+// const db = getFirestore(firebaseApp);
+
+admin.initializeApp();
 
 module.exports = {
     Upload: GraphQLUpload,
@@ -176,7 +195,7 @@ module.exports = {
     },
 
     register: async args => {
-        const { name, email, password, neighborhood } = args.user;
+        const { name, email, neighborhood } = args.user;
         console.log(neighborhood);
         const neighborhoodFound = await Neighborhood.findOne({ name: neighborhood });
         console.log(neighborhoodFound);
@@ -185,7 +204,6 @@ module.exports = {
         const user = new User({
             name,
             email,
-            password: await bcrypt.hash(password, 10),
             role: "USER",
             neighborhood: neighborhoodFound.id,
         });
@@ -193,15 +211,38 @@ module.exports = {
         return newUser;
     },
 
-    login: async ({ email, password }) => {
+    /**
+     * Logs the user in or redirects if not registered.
+     * Note: to pass in the actual idToken, call the user.getIdToken() method
+     * @param {Object} args - idToken and email: 
+     * @returns 
+     */
+    login: async ({ idToken, email }) => {
+        // verify the token
+        // idToken comes from the client app
+        admin
+            .auth()
+            .verifyIdToken(idToken)
+            .then((decodedToken) => {
+                const uid = decodedToken.uid;
+                console.log("UID:  ", uid); // todo: delete this line after testing
+            // ...
+            })
+            .catch((error) => {
+                // Handle error
+                
+                throw new Error(error);
+            });
+
+        // if the user is in our database, log him in
+        // else, redirect to sign up page to provide further information
         const user = await User.findOne({ email: email }).populate("neighborhood");
-        console.log("User logged in:", user, new Date());
+        
+        //TODO: modify to redirect the user to the sign up page if they are not registered
         if (!user) throw new Error("User not found.");
-        const { id, password: dbPassword, role, neighborhood } = user;
 
-        const valid = await bcrypt.compare(password, dbPassword);
-        if (!valid) throw new Error("Invalid password.");
-
+        console.log("User logged in:", user, new Date());
+        const { id, role, neighborhood } = user;
         const token = jwt.sign(
             {
                 [DOMAIN]: {

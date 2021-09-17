@@ -143,7 +143,6 @@ module.exports = buildSchema(`
     input RegistrationInput {
         name: String!
         email: String!
-        password: String!
         neighborhood: String
     } 
 
@@ -169,7 +168,7 @@ module.exports = buildSchema(`
         createPartialAnimal(partial: PartialAnimalInput!): PartialAnimal!
         createPartialVehicle(partial: PartialVehicleInput!): PartialVehicle!
         register(user: RegistrationInput): User!
-        login(email: String!, password: String!): LoginPayload!
+        login(idToken: String!, email: String!): LoginPayload!
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
     }
