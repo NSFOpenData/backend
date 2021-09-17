@@ -147,8 +147,9 @@ module.exports = buildSchema(`
     } 
 
     type LoginPayload {
+        isRestered: Boolean!
         token: String!
-        user: User!
+        user: User
     }
 
     type Query {

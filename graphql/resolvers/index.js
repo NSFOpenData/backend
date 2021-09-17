@@ -220,6 +220,9 @@ module.exports = {
     login: async ({ idToken, email }) => {
         // verify the token
         // idToken comes from the client app
+        var token = " "
+        var isRegistered = true;
+
         admin
             .auth()
             .verifyIdToken(idToken)
@@ -237,13 +240,17 @@ module.exports = {
         // if the user is in our database, log him in
         // else, redirect to sign up page to provide further information
         const user = await User.findOne({ email: email }).populate("neighborhood");
-        
-        //TODO: modify to redirect the user to the sign up page if they are not registered
-        if (!user) throw new Error("User not found.");
+
+        // if the user is not registered, return empty token and false registration
+        if (!user){
+            isRegistered = false;
+            return { isRegistered, token };
+        } 
 
         console.log("User logged in:", user, new Date());
         const { id, role, neighborhood } = user;
-        const token = jwt.sign(
+        // eslint-disable-next-line no-const-assign
+        token = jwt.sign(
             {
                 [DOMAIN]: {
                     email,
@@ -258,6 +265,6 @@ module.exports = {
                 expiresIn: "7d",
             }
         );
-        return { token, user };
+        return { isRegistered, token, user };
     },
 };
