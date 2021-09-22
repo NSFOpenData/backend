@@ -147,7 +147,7 @@ module.exports = buildSchema(`
     } 
 
     type LoginPayload {
-        isRestered: Boolean!
+        isRegistered: Boolean!
         token: String!
         user: User
     }

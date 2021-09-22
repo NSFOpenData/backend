@@ -215,7 +215,7 @@ module.exports = {
      * Logs the user in or redirects if not registered.
      * Note: to pass in the actual idToken, call the user.getIdToken() method
      * @param {Object} args - idToken and email: 
-     * @returns 
+     * @returns LoginPayload
      */
     login: async ({ idToken, email }) => {
         // verify the token
