@@ -25,6 +25,7 @@ module.exports = buildSchema(`
         make: String
         model: String
         license: String
+        imagesID: String
         files: [String!]
     }
 
@@ -72,6 +73,7 @@ module.exports = buildSchema(`
         color: String
         breed: String
         type: String
+        imagesID: String
         files: [String!]
     }
 
@@ -159,6 +161,7 @@ module.exports = buildSchema(`
         nearestNeighborhood(location: LocationInput!): Neighborhood
         findVehicles(params: VehicleSearchInput!): [Vehicle!]
         findAnimals(params: AnimalSearchInput!): [Animal!]
+        getUniqueID: String!
         me: User
     }
 

@@ -10,6 +10,8 @@ const { Animal, PartialAnimal } = require("../../models/animal");
 const User = require("../../models/user");
 const Neighborhood = require("../../models/neighborhood");
 
+var uuid = require('uuid');
+
 const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
 
 module.exports = {
@@ -65,12 +67,27 @@ module.exports = {
         return neighborhood;
     },
 
-    createVehicle: async ({ vehicle }, { user }) => {
+    // a function that uploads a file given name and stream
+    // uploadFile: async ({ stream, filename }) => {
+    //     const path = `images/${shortid.generate()}-${filename}`;
+
+    //     return new Promise((resolve, reject) => 
+    //         stream
+    //             .pipe(fs.createWriteStream(path))
+    //             .on("finish", () => resolve({ path }))
+    //             .on("error", reject),
+    //     )
+    // },
+    getUniqueID: async () => { // generates unique ID's to save images
+        return uuid.v4();
+    },
+
+    createVehicle: async ({ vehicle}, { user }) => {
         const { lat, lon, name } = vehicle.location;
         if (!name) vehicle.location.name = await getLocation(lat, lon);
         if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
 
-        const { color, make, model, license, neighborhood } = vehicle;
+        const {neighborhood, color, make, model, license} = vehicle;
         const partial = await PartialVehicle.find({
             neighborhood,
             color,
@@ -78,12 +95,18 @@ module.exports = {
             model,
             ...(license && { license }), // include license only if supplied
         }).populate("createdBy");
+        console.log("createVehicle called 3");
 
-        const vehicleDoc = new Vehicle(vehicle);
+        // creates a Vehicle object from passed in vehicle info including images
+        const vehicleDoc = new Vehicle(vehicle); 
         if (partial.length)
             partial.forEach(p => {
                 sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", makeBody(vehicleDoc));
             });
+
+
+        // newVehicle.picture = await uploadFile(picture.createReadStream(), picture.filename);
+
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
     },
