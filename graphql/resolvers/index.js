@@ -102,6 +102,7 @@ module.exports = {
     },
 
     createVehicle: async ({ vehicle}, { user }) => {
+        console.log("\ncreateVehicle called\n");
         const { lat, lon, name } = vehicle.location;
         if (!name) vehicle.location.name = await getLocation(lat, lon);
         if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
@@ -114,7 +115,6 @@ module.exports = {
             model,
             ...(license && { license }), // include license only if supplied
         }).populate("createdBy");
-        console.log("createVehicle called 3");
 
         // creates a Vehicle object from passed in vehicle info including images
         const vehicleDoc = new Vehicle(vehicle); 

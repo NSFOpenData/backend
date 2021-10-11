@@ -14,6 +14,7 @@ const graphqlResolvers = require("./graphql/resolvers");
 const { uploadFile, getFile } = require("./swift");
 const { Animal } = require("./models/animal");
 const { Vehicle } = require("./models/vehicle");
+const uuid = require('uuid');
 
 require("dotenv").config();
 const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
@@ -76,43 +77,56 @@ const checkValidID = async (id, item) => {
     return found;
 };
 
-app.post("/upload", upload.array("images"), async (req, res) => {
+// TODO: NOT FINISHED YET
+app.post("/upload_new", upload.array("images"), async (req, res) => {
     let summary = "";
-    let item = "";
+    let item = ""; 
+
     const { id, type } = req.body;
 
     if (!id || !type) res.status(400).send("both type and id fields required");
 
     // check valid id
-    item = await checkValidID(id, type);
-    if (!item) res.status(404).send(`no ${type} with that id found, type or id might be incorrect`);
+    item = await uuid.validate(id);
+    if (!item) res.status(404).send(`Invalid uuid provided`);
 
     // do the uploads
+    let uploads = [];
     try {
-        let uploads = [];
+        console.log("\nfiles: ", req.files);
         for (let file of req.files) {
             const { originalname: name, buffer } = file;
             const prefix = `${type}/${id}`;
-            if (item.files.includes(name)) {
-                summary += `file exists with name: ${prefix}/${name}, skipping... <br>`;
-                continue;
-            }
+            // if (item.files.includes(name)) { // FIXME: Logic not relevant for now
+            //     summary += `file exists with name: ${prefix}/${name}, skipping... <br>`;
+            //     continue;
+            // }
             const status = await uploadFile(prefix, name, buffer);
             if (status === 201) {
                 summary += `${prefix}/${name} created successfully<br>`;
                 uploads.push(name);
             } else summary += `${name} bugged with status ${status}\n`;
         }
-        // update the files field in the object
-        if (item.files) item.files.push(...uploads);
-        else item.files = uploads;
-        console.log(item);
-        await item.save();
+
+        console.log("summary: ", summary);
+        // if (type == "vehicle"):
+
+        // todo: create new object including files
+
+        // // update the files field in the object
+        // if (item.files) item.files.push(...uploads);
+        // else item.files = uploads;
+        // console.log(item);
+        // await item.save();
     } catch (error) {
         console.log(error);
         throw error;
     }
-    return res.send(summary);
+    console.log("uploads", uploads);
+    
+
+    // send successfull response // todo: not finished yet
+    res.status(200).send(uploads);
 });
 
 // endpoint to get images from the server
