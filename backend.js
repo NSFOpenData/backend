@@ -79,6 +79,7 @@ const checkValidID = async (id, item) => {
 
 // TODO: NOT FINISHED YET
 app.post("/upload_new", upload.array("images"), async (req, res) => {
+    console.log("\n 1 \n");
     let summary = "";
     let item = ""; 
 
