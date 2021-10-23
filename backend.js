@@ -25,6 +25,37 @@ const app = express();
 
 app.use(Sentry.Handlers.requestHandler());
 
+app.use(cors());
+
+app.use(helmet());
+
+app.use(
+    expressJWT({
+        secret: JWT_SECRET,
+        algorithms: ["HS256"],
+        credentialsRequired: false,
+    })
+);
+
+app.use(
+    "/graphql",
+    graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
+    graphqlHTTP({
+        schema: graphqlSchema,
+        rootValue: graphqlResolvers,
+        graphiql: true,
+    })
+);
+
+const uri = DB;
+const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
+mongoose
+    .connect(uri, options)
+    .then(() => app.listen(3000, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
+    .catch(error => {
+        throw error;
+    });
+
 const html = `
 <!DOCTYPE html>
     <head><title>nsf open data</title></head>
@@ -77,7 +108,25 @@ const checkValidID = async (id, item) => {
     return found;
 };
 
-// TODO: NOT FINISHED YET
+// endpoint to get images from the server
+app.get("/file/:type/:id/:filename", async (req, res) => {
+    const { type, id, filename } = req.params;
+    console.log(`${filename} requested to be served`);
+
+    // check valid id
+    const item = await checkValidID(id, type);
+    if (!item) res.status(404).send(`no ${type} with that id found, type or id might be incorrect`);
+
+    try {
+        const prefix = `${type}/${id}`;
+        const file = await getFile(prefix, filename);
+        res.send(await file.buffer());
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(error);
+    }
+});
+
 app.post("/upload_new", upload.array("images"), async (req, res) => {
     console.log("\n 1 \n");
     let summary = "";
@@ -130,54 +179,7 @@ app.post("/upload_new", upload.array("images"), async (req, res) => {
     res.status(200).send(uploads);
 });
 
-// endpoint to get images from the server
-app.get("/file/:type/:id/:filename", async (req, res) => {
-    const { type, id, filename } = req.params;
-    console.log(`${filename} requested to be served`);
-
-    // check valid id
-    const item = await checkValidID(id, type);
-    if (!item) res.status(404).send(`no ${type} with that id found, type or id might be incorrect`);
-
-    try {
-        const prefix = `${type}/${id}`;
-        const file = await getFile(prefix, filename);
-        res.send(await file.buffer());
-    } catch (error) {
-        console.log(error);
-        res.sendStatus(error);
-    }
-});
-
 app.use(Sentry.Handlers.errorHandler());
 
-app.use(cors());
 
-app.use(helmet());
 
-app.use(
-    expressJWT({
-        secret: JWT_SECRET,
-        algorithms: ["HS256"],
-        credentialsRequired: false,
-    })
-);
-
-app.use(
-    "/graphql",
-    graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
-    graphqlHTTP({
-        schema: graphqlSchema,
-        rootValue: graphqlResolvers,
-        graphiql: true,
-    })
-);
-
-const uri = DB;
-const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
-mongoose
-    .connect(uri, options)
-    .then(() => app.listen(3000, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
-    .catch(error => {
-        throw error;
-    });
