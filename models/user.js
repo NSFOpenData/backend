@@ -6,7 +6,6 @@ const userSchema = new Schema(
     {
         name: { type: String, required: true },
         email: { type: String, required: true },
-        password: { type: String, required: true },
         neighborhood: { type: Schema.Types.ObjectId, required: true, ref: "Neighborhood" },
         role: {
             type: String,
