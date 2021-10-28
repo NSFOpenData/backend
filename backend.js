@@ -37,15 +37,6 @@ app.use(
     })
 );
 
-app.use(
-    "/graphql",
-    graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
-    graphqlHTTP({
-        schema: graphqlSchema,
-        rootValue: graphqlResolvers,
-        graphiql: true,
-    })
-);
 
 const uri = DB;
 const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
@@ -72,6 +63,17 @@ const html = `
     </body>
 </html>
 `;
+
+app.use(
+    "/graphql",
+    graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
+    graphqlHTTP({
+        schema: graphqlSchema,
+        rootValue: graphqlResolvers,
+        graphiql: true,
+    })
+);
+
 
 app.get("/", (req, res) => {
     res.send(html);
@@ -127,7 +129,7 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
     }
 });
 
-app.post("/upload_new", upload.array("images"), async (req, res) => {
+app.post("/upload", upload.array("images"), async (req, res) => {
     console.log("\n 1 \n");
     let summary = "";
     let item = ""; 
@@ -145,41 +147,29 @@ app.post("/upload_new", upload.array("images"), async (req, res) => {
     try {
         console.log("\nfiles: ", req.files);
         for (let file of req.files) {
-            const { originalname: name, buffer } = file;
+            const { originalname: name, buffer} = file; 
             const prefix = `${type}/${id}`;
-            // if (item.files.includes(name)) { // FIXME: Logic not relevant for now
-            //     summary += `file exists with name: ${prefix}/${name}, skipping... <br>`;
-            //     continue;
-            // }
-            const status = await uploadFile(prefix, name, buffer);
+            
+            const status =  await uploadFile(prefix, name, buffer);
             if (status === 201) {
                 summary += `${prefix}/${name} created successfully<br>`;
-                uploads.push(name);
+                uploads.push(`${prefix}/${name}`);
             } else summary += `${name} bugged with status ${status}\n`;
         }
 
-        console.log("summary: ", summary);
-        // if (type == "vehicle"):
-
-        // todo: create new object including files
-
-        // // update the files field in the object
-        // if (item.files) item.files.push(...uploads);
-        // else item.files = uploads;
-        // console.log(item);
-        // await item.save();
+    console.log("summary: ", summary);
     } catch (error) {
         console.log(error);
         throw error;
     }
     console.log("uploads", uploads);
-    
 
-    // send successfull response // todo: not finished yet
-    res.status(200).send(uploads);
+    res.status(200).send(uploads.join(","));
 });
 
 app.use(Sentry.Handlers.errorHandler());
+
+
 
 
 

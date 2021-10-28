@@ -102,7 +102,7 @@ module.exports = {
     },
 
     createVehicle: async ({ vehicle}, { user }) => {
-        console.log("\ncreateVehicle called\n");
+        console.log("Input vehicle", vehicle); // todo; delete
         const { lat, lon, name } = vehicle.location;
         if (!name) vehicle.location.name = await getLocation(lat, lon);
         if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
@@ -122,11 +122,10 @@ module.exports = {
             partial.forEach(p => {
                 sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", makeBody(vehicleDoc));
             });
-
-
-        // newVehicle.picture = await uploadFile(picture.createReadStream(), picture.filename);
-
+            
         const newVehicle = await vehicleDoc.save();
+
+        console.log(newVehicle);
         return newVehicle;
     },
 
@@ -147,11 +146,12 @@ module.exports = {
     },
 
     createAnimal: async ({ animal }, { user }) => {
+        console.log("Input animal", animal); // todo; delete
         const { lat, lon, name } = animal.location;
         if (!name) animal.location.name = await getLocation(lat, lon);
         if (!animal.neighborhood) animal.neighborhood = user[DOMAIN].neighborhood;
 
-        const { breed, color, type, neighborhood, files } = animal;
+        const { breed, color, type, neighborhood} = animal;
         const partial = await PartialAnimal.find({
             breed,
             color,
@@ -161,20 +161,13 @@ module.exports = {
 
         const animalDoc = new Animal(animal);
 
-        console.log(files);
-        if (files) {
-            animal.files = [];
-            for (let file of files) {
-                console.log("this is a file", file); // logging this shows file has a file object
-                const { filename: name, stream } = file;
-                const prefix = `{type}/${animalDoc._doc._id}`;
-                const status = await uploadFile(prefix, name, stream);
-                if (status === 201) {
-                    console.log(`${prefix}/${name} created successfully`);
-                    animal.files.push(name);
-                } else console.log(`${name} bugged with status ${status}\n`);
-            }
-        }
+        // console.log(files);
+        // if (files) {
+        //     animal.files = [];
+        //     for (let fileName of files) {
+        //         animal.files.push(fileName);
+        //     }
+        // }
 
         if (partial.length)
             partial.forEach(p => {

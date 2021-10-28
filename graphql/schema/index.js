@@ -36,6 +36,8 @@ module.exports = buildSchema(`
         make: String
         model: String
         license: String
+        imagesID: String
+        files: [String]
     }
 
     input VehicleSearchInput {

@@ -15,7 +15,21 @@ const makeBody = obj => {
     const locationURL = "https://www.google.com/maps/search/?api=1&query=" + item._doc.location.lat + "," + item._doc.location.lon;
 
     const article = model === "Animal" ? "An" : "A";
-    return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>Location: ${locationURL}</p><br><p>${item}</p>`;
+
+    // return html with image and info
+    // build htmls images from files
+    let images = "";
+    if (item._doc.files) {
+        item._doc.files.forEach(file => {
+            images += `<img src="${file.url}" alt="${file.name}" style="width:100%">`;
+        });
+    }
+
+    return `
+    <h1>${article} ${model} matching your description has been found with the following details</h1><br>
+    ${images} <br>
+    <p>Location: <a href="${locationURL}">${item.location.address}</a></p>
+    `;
 };
 
 /**
