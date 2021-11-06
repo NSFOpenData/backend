@@ -27,25 +27,6 @@ app.use(Sentry.Handlers.requestHandler());
 
 app.use(cors());
 
-app.use(helmet());
-
-app.use(
-    expressJWT({
-        secret: JWT_SECRET,
-        algorithms: ["HS256"],
-        credentialsRequired: false,
-    })
-);
-
-
-const uri = DB;
-const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
-mongoose
-    .connect(uri, options)
-    .then(() => app.listen(3000, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
-    .catch(error => {
-        throw error;
-    });
 
 const html = `
 <!DOCTYPE html>
@@ -63,16 +44,6 @@ const html = `
     </body>
 </html>
 `;
-
-app.use(
-    "/graphql",
-    graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
-    graphqlHTTP({
-        schema: graphqlSchema,
-        rootValue: graphqlResolvers,
-        graphiql: true,
-    })
-);
 
 
 app.get("/", (req, res) => {
@@ -168,6 +139,35 @@ app.post("/upload", upload.array("images"), async (req, res) => {
 });
 
 app.use(Sentry.Handlers.errorHandler());
+
+app.use(helmet());
+
+app.use(
+    expressJWT({
+        secret: JWT_SECRET,
+        algorithms: ["HS256"],
+        credentialsRequired: false,
+    })
+);
+
+app.use(
+    "/graphql",
+    graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
+    graphqlHTTP({
+        schema: graphqlSchema,
+        rootValue: graphqlResolvers,
+        graphiql: true,
+    })
+);
+
+const uri = DB;
+const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
+mongoose
+    .connect(uri, options)
+    .then(() => app.listen(3000, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
+    .catch(error => {
+        throw error;
+});
 
 
 
