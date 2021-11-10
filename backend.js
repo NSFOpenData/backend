@@ -161,7 +161,7 @@ app.use(
 );
 
 const uri = DB;
-const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
+const options = {};
 mongoose
     .connect(uri, options)
     .then(() => app.listen(3000, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
