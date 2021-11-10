@@ -10,7 +10,8 @@ const { getFile } = require("./swift");
 const makeBody = obj => {
     let item = { ...obj }; // objects are passed by ref in js so we make a copy
     const model = item.constructor.modelName; // get the model name
-    const locationURL = "https://www.google.com/maps/search/?api=1&query=" + item._doc.location.lat + "," + item._doc.location.lon;
+    const locationURL =
+        "https://www.google.com/maps/search/?api=1&query=" + item._doc.location.lat + "," + item._doc.location.lon;
 
     const article = model === "Animal" ? "An" : "A";
 
@@ -19,7 +20,6 @@ const makeBody = obj => {
     let images = "";
     if (item._doc.files) {
         item._doc.files.forEach(file => {
-
             // get file from swift
             var fileArr = file.split("/");
             var fileName = fileArr[2];
@@ -30,12 +30,13 @@ const makeBody = obj => {
                 .then(data => {
                     // create image tag using returned data
                     console.log(data);
-                    images += `<img src="${data.url}" alt="${data.name}" style="width:100%">`;                })
+                    images += `<img src="${data.url}" alt="${data.name}" style="width:100%">`;
+                })
                 .catch(err => {
                     console.log(err);
                 });
         });
-    }  
+    }
 
     return `
     <h1>${article} ${model} matching your description has been found with the following details</h1><br>
