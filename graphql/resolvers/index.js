@@ -10,7 +10,7 @@ const User = require("../../models/user");
 const Neighborhood = require("../../models/neighborhood");
 var admin = require("firebase-admin");
 
-var uuid = require('uuid');
+var uuid = require("uuid");
 
 const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
 
@@ -81,14 +81,15 @@ module.exports = {
     // uploadFile: async ({ stream, filename }) => {
     //     const path = `images/${shortid.generate()}-${filename}`;
 
-    //     return new Promise((resolve, reject) => 
+    //     return new Promise((resolve, reject) =>
     //         stream
     //             .pipe(fs.createWriteStream(path))
     //             .on("finish", () => resolve({ path }))
     //             .on("error", reject),
     //     )
     // },
-    getUniqueID: async () => { // generates unique ID's to save images
+    getUniqueID: async () => {
+        // generates unique ID's to save images
         return uuid.v4();
     },
 
@@ -97,7 +98,7 @@ module.exports = {
         if (!name) vehicle.location.name = await getLocation(lat, lon);
         if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
 
-        const {neighborhood, color, make, model, license} = vehicle;
+        const { neighborhood, color, make, model, license } = vehicle;
         const partial = await PartialVehicle.find({
             neighborhood,
             color,
@@ -107,7 +108,7 @@ module.exports = {
         }).populate("createdBy");
 
         // creates a Vehicle object from passed in vehicle info including images
-        const vehicleDoc = new Vehicle(vehicle); 
+        const vehicleDoc = new Vehicle(vehicle);
         if (partial.length)
             partial.forEach(async p => {
                 console.log("Vehicle match now sending email");
@@ -115,7 +116,7 @@ module.exports = {
                 console.log("Email body", body);
                 sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
             });
-            
+
         const newVehicle = await vehicleDoc.save();
         return newVehicle;
     },
@@ -142,7 +143,7 @@ module.exports = {
         if (!name) animal.location.name = await getLocation(lat, lon);
         if (!animal.neighborhood) animal.neighborhood = user[DOMAIN].neighborhood;
 
-        const { breed, color, type, neighborhood} = animal;
+        const { breed, color, type, neighborhood } = animal;
         const partial = await PartialAnimal.find({
             breed,
             color,
@@ -213,26 +214,26 @@ module.exports = {
     /**
      * Logs the user in or redirects if not registered.
      * Note: to pass in the actual idToken, call the user.getIdToken() method
-     * @param {Object} args - idToken and email: 
+     * @param {Object} args - idToken and email:
      * @returns LoginPayload
      */
     login: async ({ idToken, email }) => {
         // verify the token
         // idToken comes from the client app
-        var token = " "
+        var token = " ";
         var isRegistered = true;
 
         admin
             .auth()
             .verifyIdToken(idToken)
-            .then((decodedToken) => {
+            .then(decodedToken => {
                 const uid = decodedToken.uid;
                 console.log("UID:  ", uid); // todo: delete this line after testing
-            // ...
+                // ...
             })
-            .catch((error) => {
+            .catch(error => {
                 // Handle error
-                
+
                 throw new Error(error);
             });
 
@@ -241,10 +242,10 @@ module.exports = {
         const user = await User.findOne({ email: email }).populate("neighborhood");
 
         // if the user is not registered, return empty token and false registration
-        if (!user){
+        if (!user) {
             isRegistered = false;
             return { isRegistered, token };
-        } 
+        }
 
         console.log("User logged in:", user, new Date());
         const { id, role, neighborhood } = user;

@@ -14,7 +14,7 @@ const graphqlResolvers = require("./graphql/resolvers");
 const { uploadFile, getFile } = require("./swift");
 const { Animal } = require("./models/animal");
 const { Vehicle } = require("./models/vehicle");
-const uuid = require('uuid');
+const uuid = require("uuid");
 
 require("dotenv").config();
 const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
@@ -26,7 +26,6 @@ const app = express();
 app.use(Sentry.Handlers.requestHandler());
 
 app.use(cors());
-
 
 const html = `
 <!DOCTYPE html>
@@ -44,7 +43,6 @@ const html = `
     </body>
 </html>
 `;
-
 
 app.get("/", (req, res) => {
     res.send(html);
@@ -100,7 +98,7 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
 
 app.post("/upload", upload.array("images"), async (req, res) => {
     let summary = "";
-    let item = ""; 
+    let item = "";
 
     const { id, type } = req.body;
 
@@ -114,10 +112,10 @@ app.post("/upload", upload.array("images"), async (req, res) => {
     let uploads = [];
     try {
         for (let file of req.files) {
-            const { originalname: name, buffer} = file; 
+            const { originalname: name, buffer } = file;
             const prefix = `${type}/${id}`;
-            
-            const status =  await uploadFile(prefix, name, buffer);
+
+            const status = await uploadFile(prefix, name, buffer);
             if (status === 201) {
                 summary += `${prefix}/${name} created successfully<br>`;
                 uploads.push(`${prefix}/${name}`);
@@ -153,15 +151,10 @@ app.use(
 );
 
 const uri = DB;
-const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
+const options = {};
 mongoose
     .connect(uri, options)
     .then(() => app.listen(3000, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
     .catch(error => {
         throw error;
-});
-
-
-
-
-
+    });
