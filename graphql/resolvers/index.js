@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const geolib = require("geolib");
 const { GraphQLUpload } = require("graphql-upload");
 const { getLocation, sendEmail, makeBody } = require("../../utils");
-const { uploadFile } = require("../../swift");
+// const { uploadFile } = require("../../swift");
 
 const { Vehicle, PartialVehicle } = require("../../models/vehicle");
 const { Animal, PartialAnimal } = require("../../models/animal");
@@ -14,24 +14,15 @@ var uuid = require('uuid');
 
 const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
 
-// import { initializeApp } from 'firebase/app';
-// import {getAuth } from 'firebase/auth';
-// import {getFirestore } from 'firebase/firestore';
-
-// const firebaseApp = initializeApp({
-//     apiKey: "AIzaSyBdtgJTpg8-pYIb7sMny70qeJICM-fiSqY",
-//     authDomain: "nsfopendata.firebaseapp.com",
-//     projectId: "nsfopendata",
-//     storageBucket: "nsfopendata.appspot.com",
-//     messagingSenderId: "534112304877",
-//     appId: "1:534112304877:web:82adc6a18d014a931cd6e4",
-//     measurementId: "G-67PGJ786CW"
-// });
-
-// const auth = getAuth(firebaseApp);
-// const db = getFirestore(firebaseApp);
-
-admin.initializeApp();
+admin.initializeApp({
+    apiKey: "AIzaSyBdtgJTpg8-pYIb7sMny70qeJICM-fiSqY",
+    authDomain: "nsfopendata.firebaseapp.com",
+    projectId: "nsfopendata",
+    storageBucket: "nsfopendata.appspot.com",
+    messagingSenderId: "534112304877",
+    appId: "1:534112304877:web:82adc6a18d014a931cd6e4",
+    measurementId: "G-67PGJ786CW"
+});
 
 module.exports = {
     Upload: GraphQLUpload,
@@ -102,7 +93,6 @@ module.exports = {
     },
 
     createVehicle: async ({ vehicle}, { user }) => {
-        console.log("Input vehicle", vehicle); // todo; delete
         const { lat, lon, name } = vehicle.location;
         if (!name) vehicle.location.name = await getLocation(lat, lon);
         if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
@@ -119,13 +109,14 @@ module.exports = {
         // creates a Vehicle object from passed in vehicle info including images
         const vehicleDoc = new Vehicle(vehicle); 
         if (partial.length)
-            partial.forEach(p => {
-                sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", makeBody(vehicleDoc));
+            partial.forEach(async p => {
+                console.log("Vehicle match now sending email");
+                var body = await makeBody(vehicleDoc)
+                console.log("Email body", body);
+                sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
             });
             
         const newVehicle = await vehicleDoc.save();
-
-        console.log(newVehicle);
         return newVehicle;
     },
 
@@ -160,14 +151,6 @@ module.exports = {
         }).populate("createdBy");
 
         const animalDoc = new Animal(animal);
-
-        // console.log(files);
-        // if (files) {
-        //     animal.files = [];
-        //     for (let fileName of files) {
-        //         animal.files.push(fileName);
-        //     }
-        // }
 
         if (partial.length)
             partial.forEach(p => {
@@ -281,6 +264,7 @@ module.exports = {
                 expiresIn: "7d",
             }
         );
+        console.log("Token: ", token);
         return { isRegistered, token, user };
     },
 };

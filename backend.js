@@ -66,7 +66,6 @@ const upload = multer({ storage: storage });
  * @returns the object if found else null
  */
 const checkValidID = async (id, item) => {
-    console.log(`checking valid id for id: ${id} and item: ${item}`);
     item = item.toLowerCase();
     // map to the database model
     const object = {
@@ -77,7 +76,6 @@ const checkValidID = async (id, item) => {
     if (!Object.prototype.hasOwnProperty.call(object, item)) return false;
 
     const found = await object[item].findById(id);
-    console.log(found);
     return found;
 };
 
@@ -101,7 +99,6 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
 });
 
 app.post("/upload", upload.array("images"), async (req, res) => {
-    console.log("\n 1 \n");
     let summary = "";
     let item = ""; 
 
@@ -116,7 +113,6 @@ app.post("/upload", upload.array("images"), async (req, res) => {
     // do the uploads
     let uploads = [];
     try {
-        console.log("\nfiles: ", req.files);
         for (let file of req.files) {
             const { originalname: name, buffer} = file; 
             const prefix = `${type}/${id}`;
@@ -127,14 +123,10 @@ app.post("/upload", upload.array("images"), async (req, res) => {
                 uploads.push(`${prefix}/${name}`);
             } else summary += `${name} bugged with status ${status}\n`;
         }
-
-    console.log("summary: ", summary);
     } catch (error) {
         console.log(error);
         throw error;
     }
-    console.log("uploads", uploads);
-
     res.status(200).send(uploads.join(","));
 });
 
