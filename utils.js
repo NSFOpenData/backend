@@ -23,9 +23,11 @@ const makeBody = async obj => {
             var fileName = fileArr[2];
             var prefix = fileArr[0] + "/" + fileArr[1];
 
-            // get file using prefix and name
-            const data = await getFile(prefix, fileName);
-            images += `<img src="${data.url}" alt="${fileName}" style="width:100%">`;
+            // get image and buffer it
+            const response = await getFile(prefix, fileName);
+            const imageBuffer = Buffer.from(response.body._readableState.buffer);
+            const base64Image = imageBuffer.toString("base64");
+            images += `<img src="data:image/png;base64,${base64Image}" alt="${fileName}" />`;
         }
         return images;
     };
