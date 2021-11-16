@@ -25,7 +25,11 @@ const makeBody = async obj => {
 
             // get image and buffer it
             const response = await getFile(prefix, fileName);
-            const imageBuffer = Buffer.from(response.body._readableState.buffer);
+            // console.log("buffer", response.body._readableState.buffer);
+            // console.log("Buffer head", response.body._readableState.buffer.head); // todo: remove
+            // console.log("Buffer tail", response.body._readableState.buffer.tail); // todo: remove
+
+            const imageBuffer = Buffer.from(response.body._readableState.buffer.head.data);
             const base64Image = imageBuffer.toString("base64");
             images += `<img src="data:image/png;base64,${base64Image}" alt="${fileName}" />`;
         }
