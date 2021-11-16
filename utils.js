@@ -31,7 +31,9 @@ const makeBody = async obj => {
 
             const imageBuffer = Buffer.from(response.body._readableState.buffer.head.data);
             const base64Image = imageBuffer.toString("base64");
-            images += `<img src="data:image/png;base64,${base64Image}" alt="${fileName}" />`;
+
+            // add image to html
+            images += `<img src="data:image/png;base64,${base64Image}" alt="${fileName}" width="40" height="40">`;
         }
         return images;
     };
