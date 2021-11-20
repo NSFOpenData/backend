@@ -1,6 +1,7 @@
 const fetch = require("node-fetch");
 const nodemailer = require("nodemailer");
 const { getFile } = require("./swift");
+const fs = require("fs");
 
 /**
  * Create html body to send in emails
@@ -25,15 +26,25 @@ const makeBody = async obj => {
 
             // get image and buffer it
             const response = await getFile(prefix, fileName);
-            // console.log("buffer", response.body._readableState.buffer);
-            // console.log("Buffer head", response.body._readableState.buffer.head); // todo: remove
-            // console.log("Buffer tail", response.body._readableState.buffer.tail); // todo: remove
+            console.log("buffer", response.body._readableState.buffer);
+            console.log("content Type: ", response.headers["content-type"])
+            console.log("Buffer head", response.body._readableState.buffer.head); // todo: remove
+            console.log("Buffer tail", response.body._readableState.buffer.tail); // todo: remove
+           
+            const base64Image = Buffer.from(response.body._readableState.buffer.head.data, 'base64');
 
-            const imageBuffer = Buffer.from(response.body._readableState.buffer.head.data);
-            const base64Image = imageBuffer.toString("base64");
+            // write image to file
+            // const filePath = "./images/" + fileName;
+            fs.writeFile("image.png", base64Image, function (err) {
+                if (err) {
+                    console.log("There was an error: ", err);
+                } else {
+                    console.log("The file was saved!");
+                }
+            });
 
             // add image to html
-            images += `<img src="data:image/png;base64,${base64Image}" alt="${fileName}" width="40" height="40">`;
+            images += `<img src="data:image/png;base64,${base64Image}" alt="${fileName}" width="100" height="100"/>`;
         }
         return images;
     };

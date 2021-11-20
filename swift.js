@@ -79,6 +79,7 @@ const getFile = async (prefix, filename) => {
     const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${prefix}/${filename}`;
     const data = await fetch(url, {
         method: "get",
+        encoding: null,
         headers: {
             "X-Auth-Token": authToken,
         },
