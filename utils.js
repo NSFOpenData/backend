@@ -31,19 +31,18 @@ const makeBody = async obj => {
             console.log("Buffer head", response.body._readableState.buffer.head); // todo: remove
             console.log("Buffer tail", response.body._readableState.buffer.tail); // todo: remove
 
-            var buf = response.body._readableState.buffer.head.data
-           
-            const base64Image = buf.toString("base64");
-            
+            const base64Image = Buffer.from(response.body._readableState.buffer.head.data, 'base64');
+
             // write image to file
             // const filePath = "./images/" + fileName;
-            // fs.writeFile("image.png", base64Image, function (err) {
-            //     if (err) {
-            //         console.log("There was an error: ", err);
-            //     } else {
-            //         console.log("The file was saved!");
-            //     }
-            // });
+            fs.writeFile("image.png", base64Image, function (err) {
+                if (err) {
+                    console.log("There was an error: ", err);
+                } else {
+                    console.log("The file was saved!");
+                }
+            });
+
 
             // add image to html
             images += `<img src="data:image/png;base64,${base64Image}" alt="${fileName}" width="100" height="100"/>`;
