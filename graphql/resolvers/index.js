@@ -206,7 +206,7 @@ module.exports = {
             role: "USER",
             neighborhood: neighborhoodFound.id,
         });
-        const newUser = await user.save().then(u => u.populate("neighborhood").execPopulate());
+        const newUser = await user.save().then(u => u.populate("neighborhood"));
         return newUser;
     },
 
