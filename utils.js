@@ -33,11 +33,11 @@ const makeBody = async obj => {
             attachments.push({
                 filename: fileName,
                 content: buffer,
-                cid: fileArr[0]
+                cid: fileArr[1]
             })
             
             // add image to html
-            images += `<img src="cid:${fileArr[0]}" alt="${fileName}" width="100" height="100"/>`;
+            images += `<img src="cid:${fileArr[1]}" alt="${fileName}" width="100" height="100"/>`;
         }
         return images;
     };
@@ -83,7 +83,6 @@ const sendEmail = (recipient, subject, bodyHtml, attachments={}) => {
             from: "noreply-nsf-scc@vanderbilt.edu",
             to: recipient,
             subject: subject,
-            text: "This is test #1", //todo: delete after testing
             html: bodyHtml,
             attachments: attachments
         },
