@@ -36,7 +36,7 @@ const makeBody = async obj => {
             })
             
             // add image to html
-            images += `<img src="cid:${fileArr[1]}" alt="${fileName}" width="100" height="100"/>`;
+            images += `<img src="cid:${fileArr[1]}" alt="${fileName}"/>`;
         }
         return images;
     };
