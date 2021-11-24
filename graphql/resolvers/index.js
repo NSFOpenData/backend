@@ -111,9 +111,9 @@ module.exports = {
         const vehicleDoc = new Vehicle(vehicle);
         if (partial.length)
             partial.forEach(async p => {
-                var body = await makeBody(vehicleDoc)
+                var {body, attachments} = await makeBody(vehicleDoc);
                 console.log("email body", body);
-                sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
+                sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body, attachments);
             });
 
         const newVehicle = await vehicleDoc.save();
@@ -201,6 +201,7 @@ module.exports = {
         if (!neighborhoodFound) throw new Error(`Neighborhood with name ${neighborhood} not found`);
 
         const user = new User({
+            // _id: args.user.id,
             name,
             email,
             role: "USER",
@@ -236,8 +237,6 @@ module.exports = {
                 throw new Error(error);
             });
 
-        // if the user is in our database, log him in
-        // else, redirect to sign up page to provide further information
         const user = await User.findOne({ email: email }).populate("neighborhood");
 
         // if the user is not registered, return empty token and false registration

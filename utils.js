@@ -14,6 +14,7 @@ const makeBody = async obj => {
     const locationURL = "https://www.google.com/maps/search/?api=1&query=" + item._doc.location.lat + "," + item._doc.location.lon;
 
     const article = model === "Animal" ? "An" : "A";
+    var attachments = []
 
     const buildImages = async allFiles => {
         let images = "";
@@ -25,27 +26,18 @@ const makeBody = async obj => {
             var prefix = fileArr[0] + "/" + fileArr[1];
 
             // get image and buffer it
-            const response = await getFile(prefix, fileName);
-            console.log("buffer", response.body._readableState.buffer);
-            console.log("content Type: ", response.headers["content-type"])
-            console.log("Buffer head", response.body._readableState.buffer.head); // todo: remove
-            console.log("Buffer tail", response.body._readableState.buffer.tail); // todo: remove
+            const data = await getFile(prefix, fileName);
+            const arrayBuffer = await data.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
 
-            const base64Image = Buffer.from(response.body._readableState.buffer.head.data, 'base64');
-
-            // write image to file
-            // const filePath = "./images/" + fileName;
-            fs.writeFile("image.png", base64Image, function (err) {
-                if (err) {
-                    console.log("There was an error: ", err);
-                } else {
-                    console.log("The file was saved!");
-                }
-            });
-
-
+            attachments.push({
+                filename: fileName,
+                content: buffer,
+                cid: fileArr[0]
+            })
+            
             // add image to html
-            images += `<img src="data:image/png;base64,${base64Image}" alt="${fileName}" width="100" height="100"/>`;
+            images += `<img src="cid:${fileArr[0]}" alt="${fileName}" width="100" height="100"/>`;
         }
         return images;
     };
@@ -56,11 +48,17 @@ const makeBody = async obj => {
     if (item._doc.files) {
         images = await buildImages(item._doc.files);
     }
-    return `
+    var htmlBody = `
         <h1>${article} ${model} matching your description has been found with the following details</h1><br>
         ${images} <br>
         <p>Location: <a href="${locationURL}">${item._doc.location.name}</a></p>
         `;
+
+    // todo: delete after testing
+    console.log("htmlBody:", htmlBody);
+    console.log("attachments", attachments);
+
+    return { htmlBody, attachments };
 };
 
 /**
@@ -69,7 +67,7 @@ const makeBody = async obj => {
  * @param {String} subject the email subject
  * @param {String} bodyHtml html body
  */
-const sendEmail = (recipient, subject, bodyHtml) => {
+const sendEmail = (recipient, subject, bodyHtml, attachments={}) => {
     console.log("Sending email to " + recipient);
     const transporter = nodemailer.createTransport({
         host: "smtp.isis.vanderbilt.edu",
@@ -85,7 +83,9 @@ const sendEmail = (recipient, subject, bodyHtml) => {
             from: "noreply-nsf-scc@vanderbilt.edu",
             to: recipient,
             subject: subject,
+            text: "This is test #1", //todo: delete after testing
             html: bodyHtml,
+            attachments: attachments
         },
         function (err) {
             if (err) {
@@ -96,6 +96,11 @@ const sendEmail = (recipient, subject, bodyHtml) => {
         }
     );
 };
+
+// todo:
+    // - create html body
+    // - create and send email
+
 
 /**
  * reverse coordinate lookup to figure out an approximate street
