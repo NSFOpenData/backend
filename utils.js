@@ -1,7 +1,6 @@
 const fetch = require("node-fetch");
 const nodemailer = require("nodemailer");
 const { getFile } = require("./swift");
-const fs = require("fs");
 
 /**
  * Create html body to send in emails
@@ -54,10 +53,6 @@ const makeBody = async obj => {
         <p>Location: <a href="${locationURL}">${item._doc.location.name}</a></p>
         `;
 
-    // todo: delete after testing
-    console.log("htmlBody:", htmlBody);
-    console.log("attachments", attachments);
-
     return { htmlBody, attachments };
 };
 
@@ -68,7 +63,6 @@ const makeBody = async obj => {
  * @param {String} bodyHtml html body
  */
 const sendEmail = (recipient, subject, bodyHtml, attachments={}) => {
-    console.log("Sending email to " + recipient);
     const transporter = nodemailer.createTransport({
         host: "smtp.isis.vanderbilt.edu",
         port: 25,
@@ -95,10 +89,6 @@ const sendEmail = (recipient, subject, bodyHtml, attachments={}) => {
         }
     );
 };
-
-// todo:
-    // - create html body
-    // - create and send email
 
 
 /**

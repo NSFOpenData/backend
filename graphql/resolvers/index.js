@@ -111,9 +111,8 @@ module.exports = {
         const vehicleDoc = new Vehicle(vehicle);
         if (partial.length)
             partial.forEach(async p => {
-                var {body, attachments} = await makeBody(vehicleDoc);
-                console.log("email body", body);
-                sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body, attachments);
+                var {htmlBody, attachments} = await makeBody(vehicleDoc);
+                sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", htmlBody, attachments);
             });
 
         const newVehicle = await vehicleDoc.save();
