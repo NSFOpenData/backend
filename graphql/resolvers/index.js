@@ -27,7 +27,7 @@ module.exports = {
     Upload: GraphQLUpload,
 
     Query: {
-        vehicles: async (_, { user }) => {
+        vehicles: async (_, args, { user }) => {
             if (!user) throw new Error("Authentication needed");
             const { role, neighborhood } = user[DOMAIN];
             if (role === "DEVELOPER") return Vehicle.find();
@@ -40,11 +40,10 @@ module.exports = {
             });
         },
     
-        animals: async (_, { user }) => {
+        animals: async (_, args, { user }) => {
             if (!user) throw new Error("Authentication needed");
             const { role, neighborhood } = user[DOMAIN];
             if (role === "DEVELOPER") return Animal.find();
-            console.log(neighborhood);
             return Animal.find({ neighborhood });
         },
     
@@ -93,7 +92,7 @@ module.exports = {
         },
     
     
-        me: async (_, { user }) => {
+        me: async (_, args, {user}) => {
             const found = await User.findById(user.sub).populate("neighborhood");
             if (!found) throw new Error("User not found.");
             return found;
@@ -101,7 +100,9 @@ module.exports = {
     },
 
     Mutation: {
-        createVehicle: async (_, { vehicle}, { user }) => {
+        createVehicle: async (_, { vehicle }, { user }) => {
+            if (!user) throw new Error("Authentication needed");
+
             const { lat, lon, name } = vehicle.location;
             if (!name) vehicle.location.name = await getLocation(lat, lon);
             if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
@@ -117,6 +118,7 @@ module.exports = {
     
             // creates a Vehicle object from passed in vehicle info including images
             const vehicleDoc = new Vehicle(vehicle);
+            console.log("partial", partial);
             if (partial.length)
                 partial.forEach(async p => {
                     var body = await makeBody(vehicleDoc)
@@ -196,7 +198,6 @@ module.exports = {
         },
     
         register: async (_, args) => {
-            console.log("register called");
             const { name, email, neighborhood } = args.user;
             const neighborhoodFound = await Neighborhood.findOne({ name: neighborhood });
             if (!neighborhoodFound) throw new Error(`Neighborhood with name ${neighborhood} not found`);

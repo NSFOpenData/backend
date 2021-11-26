@@ -50,7 +50,7 @@ const html = `
 const schema = makeExecutableSchema({
     typeDefs: graphqlSchema,
     resolvers: graphqlResolvers,
-  })
+});
 
 app.get("/", (req, res) => {
     res.send(html);
@@ -140,13 +140,12 @@ app.use(Sentry.Handlers.errorHandler());
 
 app.use(helmet());
 
-app.use(
-    expressJWT({
+app.use(expressJWT({
         secret: JWT_SECRET,
         algorithms: ["HS256"],
         credentialsRequired: false,
-    })
-);
+}));
+
 
 app.use(
     "/graphql",

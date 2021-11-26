@@ -1,5 +1,4 @@
 import { gql } from 'apollo-server-express';
-import neighborhood from '../models/neighborhood';
 import { testClient, connectTestDB, dropTestDB, closeDBConnection } from '../test/helper';
 const { ObjectId } = require('mongodb');
 const Neighborhood = require("../models/neighborhood");
