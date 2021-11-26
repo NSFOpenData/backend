@@ -1,67 +1,72 @@
-import 'cross-fetch/polyfill'
-import { gql } from 'apollo-boost'
-import { getClient } from '../test/utils'
-import { setupTest } from '../test/helper'
+import { gql } from 'apollo-server-express';
+import neighborhood from '../models/neighborhood';
+import { testClient, connectTestDB, dropTestDB, closeDBConnection } from '../test/helper';
+const { ObjectId } = require('mongodb');
+const Neighborhood = require("../models/neighborhood");
 
-const client = getClient();
-// let authenticatedClient;
 
-beforeAll(async () => await setupTest());
-// beforeAll(async () => {
-//   const registerUser = gql`
-//     mutation {
-//       register(
-//         user: {
-//           name: "Salomon",
-//           email: "salomondushimirimana@gmail.com",
-//           neighborhood: "Sylvan Park"
-//         }
-//       ) {
-//         email
-//         name
-//         role
-//         neighborhood {
-//           name
-//         }
-//       }
-//     }
-//   `;
+const {query, mutate} = testClient;
 
-//   const authenticatedUser = await client.mutate({
-//     mutation: register,
-//   });
+beforeAll(async () => {
+  await connectTestDB();
+  await dropTestDB();
+})
+
+afterAll(async () => {
+  await dropTestDB();
+  await closeDBConnection();
+});
 
 describe('Register a new user', () => {
   it('should register a new user', async () => {
-    const registerUser = gql`
-      mutation {
+    
+    await Neighborhood.create({
+      name: "Sylvan Park",
+      location: {
+        lat: "36.1430",
+        lon: "-86.8446",
+        name: "Sylvan Park"
+      },
+      dataRetention: "7d",
+    });
+
+    const user = {
+      name: "salomon",
+      email: "salomondushimirimana@gmail.com",
+      neighborhood: "Sylvan Park",
+    }
+    
+    const REGISTER_USER = gql`
+      mutation register($name: String!
+        $email: String!
+        $neighborhood: String) {
         register(
           user: {
-            name: "Eric",
-            email: "ericdushimirimana@gmail.com",
-            neighborhood: "Sylvan Park"
+            name: $name
+            email: $email
+            neighborhood: $neighborhood
           }
         ) {
           email
           name
-          role
           neighborhood {
             name
           }
         }
-      }
+      } 
     `;
 
-    const authenticatedUser = await client.mutate({
-      mutation: registerUser,
-    });
+    const { data } = await mutate({
+      mutation: REGISTER_USER,
+      variables: user
+    })
 
-    expect(authenticatedUser.data.register.email).toBe('ericdushimirimana@gmail.com');
-    expect(authenticatedUser.data.register.name).toBe('Eric');
-    expect(authenticatedUser.data.register.role).toBe('USER');
-    expect(authenticatedUser.data.register.neighborhood.name).toBe('Sylvan Park');
-  }, 20000);
+    expect(data.register.name).toBe(user.name);
+    expect(data.register.email).toBe(user.email);
+    expect(data.register.neighborhood.name).toBe(user.neighborhood);
+  });
 });
+
 
 // todo: - figure out a way to setup a test database
 // todo: - to run the tests without running the backend

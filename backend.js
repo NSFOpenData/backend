@@ -16,6 +16,9 @@ const { Animal } = require("./models/animal");
 const { Vehicle } = require("./models/vehicle");
 const uuid = require("uuid");
 
+const  { makeExecutableSchema } =  require('@graphql-tools/schema');
+
+
 require("dotenv").config();
 const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
 
@@ -43,6 +46,11 @@ const html = `
     </body>
 </html>
 `;
+
+const schema = makeExecutableSchema({
+    typeDefs: graphqlSchema,
+    resolvers: graphqlResolvers,
+  })
 
 app.get("/", (req, res) => {
     res.send(html);
@@ -144,8 +152,7 @@ app.use(
     "/graphql",
     graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
     graphqlHTTP({
-        schema: graphqlSchema,
-        rootValue: graphqlResolvers,
+        schema: schema,
         graphiql: true,
     })
 );

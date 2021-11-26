@@ -1,44 +1,57 @@
-import mongoose from 'mongoose';
-// import { server } from './connection';
+const { createTestClient } = require('apollo-server-testing');
+const { ApolloServer } = require('apollo-server-express');
+const mongoose = require('mongoose');
+require("dotenv").config();
+import ourResolvers from '../graphql/resolvers';
+import ourSchema from '../graphql/schema';
+// const jwt = require("jsonwebtoken");
 
-const { ObjectId } = mongoose.Types;
 
-const uri = process.env.DB_TEST || 'mongodb://localhost/jest';
+const { User } = require('../models/user');
 
-const config = {
-  db: {
-    test: uri,
-  },
-  connection: null,
+
+const  { makeExecutableSchema } =  require('@graphql-tools/schema');
+
+
+process.env.NODE_ENV = 'test';
+const uri = process.env.DB_TEST;
+
+const connectTestDB = async () => {
+  await mongoose.connect(uri, {}).catch(err => console.log(err));
 };
 
-function connect() {
-    try {
-        mongoose.connect(uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-        console.log('Connected to MongoDB');
-    } catch (error) {
-        console.error(error);
-        process.exit(1);
-    }
+const dropTestDB = async () => {
+  if (process.env.NODE_ENV === 'test') { // todo: do not understand NODE_ENV
+    await mongoose.connection.db.dropDatabase().catch(err => console.log(err));
+  }
 }
 
-function clearDatabase() {
-    return mongoose.connection.dropDatabase();
+const closeDBConnection = async () => {
+  await mongoose.connection.close().catch(err => console.log(err));
 }
 
-// export async function start() {
-//     global.httpServer = server;
-//     await global.httpServer.listen(process.env.PORT || 3000);
-// }
+// const schemaWithResolvers = makeExecutableSchema({
+//   typeDefs: ourSchema,
+//   resolvers: ourResolvers
+// });
 
-// export async function stop() {
-//     await global.httpServer.close();
-// }
+const server = new ApolloServer({ 
+  typeDefs: ourSchema,
+  resolvers: ourResolvers,
+  context: ({
+    req,
+    res,
+  }) => ({ 
+    req, 
+    res,
+    User,
+  }),
 
-export async function setupTest() {
-  connect();
-//   await clearDatabase();
-}
+});
+
+module.exports = {
+  testClient: createTestClient(server),
+  connectTestDB,
+  dropTestDB,
+  closeDBConnection,
+};
