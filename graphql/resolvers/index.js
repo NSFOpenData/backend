@@ -21,7 +21,7 @@ admin.initializeApp({
     storageBucket: "nsfopendata.appspot.com",
     messagingSenderId: "534112304877",
     appId: "1:534112304877:web:82adc6a18d014a931cd6e4",
-    measurementId: "G-67PGJ786CW"
+    measurementId: "G-67PGJ786CW",
 });
 
 module.exports = {
@@ -93,7 +93,7 @@ module.exports = {
         return uuid.v4();
     },
 
-    createVehicle: async ({ vehicle}, { user }) => {
+    createVehicle: async ({ vehicle }, { user }) => {
         const { lat, lon, name } = vehicle.location;
         if (!name) vehicle.location.name = await getLocation(lat, lon);
         if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
@@ -111,7 +111,7 @@ module.exports = {
         const vehicleDoc = new Vehicle(vehicle);
         if (partial.length)
             partial.forEach(async p => {
-                var body = await makeBody(vehicleDoc)
+                var body = await makeBody(vehicleDoc);
                 console.log("email body", body);
                 sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
             });
@@ -195,9 +195,7 @@ module.exports = {
 
     register: async args => {
         const { name, email, neighborhood } = args.user;
-        console.log(neighborhood);
         const neighborhoodFound = await Neighborhood.findOne({ name: neighborhood });
-        console.log(neighborhoodFound);
         if (!neighborhoodFound) throw new Error(`Neighborhood with name ${neighborhood} not found`);
 
         const user = new User({
@@ -206,7 +204,8 @@ module.exports = {
             role: "USER",
             neighborhood: neighborhoodFound.id,
         });
-        const newUser = await user.save().then(u => u.populate("neighborhood").execPopulate());
+        const newUser = await user.save().then(u => u.populate("neighborhood"));
+        console.log("new user registered: ", newUser);
         return newUser;
     },
 
@@ -220,7 +219,6 @@ module.exports = {
         // verify the token
         // idToken comes from the client app
         var token = " ";
-        var isRegistered = true;
 
         admin
             .auth()
@@ -228,7 +226,6 @@ module.exports = {
             .then(decodedToken => {
                 const uid = decodedToken.uid;
                 console.log("UID:  ", uid); // todo: delete this line after testing
-                // ...
             })
             .catch(error => {
                 // Handle error
@@ -236,17 +233,8 @@ module.exports = {
                 throw new Error(error);
             });
 
-        // if the user is in our database, log him in
-        // else, redirect to sign up page to provide further information
         const user = await User.findOne({ email: email }).populate("neighborhood");
 
-        // if the user is not registered, return empty token and false registration
-        if (!user) {
-            isRegistered = false;
-            return { isRegistered, token };
-        }
-
-        console.log("User logged in:", user, new Date());
         const { id, role, neighborhood } = user;
         // eslint-disable-next-line no-const-assign
         token = jwt.sign(
@@ -264,7 +252,16 @@ module.exports = {
                 expiresIn: "7d",
             }
         );
-        console.log("Token: ", token);
-        return { isRegistered, token, user };
+        return { token, user };
+    },
+
+    /**
+     * Checks if the user with the given email is in the database.
+     * @param {String} email - email of the user
+     * @returns True if user is found, false otherwise
+     */
+    isRegistered: async ({ email }) => {
+        const user = await User.findOne({ email: email }).populate("neighborhood");
+        return !!user; // returns true if user is found
     },
 };
