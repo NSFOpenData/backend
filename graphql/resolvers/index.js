@@ -93,6 +93,7 @@ module.exports = {
     
     
         me: async (_, args, {user}) => {
+            console.log(user);
             const found = await User.findById(user.sub).populate("neighborhood");
             if (!found) throw new Error("User not found.");
             return found;
@@ -135,7 +136,7 @@ module.exports = {
             const { neighborhood, role } = user[DOMAIN];
             if (role === "USER") throw new Error("Need to be at least a privileged user.");
             const partialVehicleDoc = new PartialVehicle({ createdBy: user.sub, neighborhood, ...partial });
-            const partialVehicle = await partialVehicleDoc.save().then(a => a.populate("createdBy").execPopulate());
+            const partialVehicle = await partialVehicleDoc.save().then(a => a.populate("createdBy"));
     
             return partialVehicle;
         },
@@ -175,12 +176,9 @@ module.exports = {
         // to create descriptions that can be matched against to alert the user
         createPartialAnimal: async (_, { partial }, { user }) => {
             if (!user) throw new Error("Authentication needed");
-            console.log(user);
             const { neighborhood } = user[DOMAIN];
             const partialAnimalDoc = new PartialAnimal({ createdBy: user.sub, neighborhood, ...partial });
-            console.log(partialAnimalDoc);
-            const partialAnimal = await partialAnimalDoc.save().then(a => a.populate("createdBy").execPopulate());
-            console.log("created partial animal description", partialAnimal);
+            const partialAnimal = await partialAnimalDoc.save().then(a => a.populate("createdBy"));
             return partialAnimal;
         },
 
