@@ -122,7 +122,6 @@ module.exports = {
             if (partial.length)
                 partial.forEach(async p => {
                     var body = await makeBody(vehicleDoc)
-                    console.log("email body", body);
                     sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
                 });
     
@@ -147,7 +146,7 @@ module.exports = {
         },
     
         createAnimal: async (_, { animal }, { user }) => {
-            console.log("Input animal", animal); // todo; delete
+            if (!user) throw new Error("Authentication needed");
             const { lat, lon, name } = animal.location;
             if (!name) animal.location.name = await getLocation(lat, lon);
             if (!animal.neighborhood) animal.neighborhood = user[DOMAIN].neighborhood;
@@ -163,9 +162,9 @@ module.exports = {
             const animalDoc = new Animal(animal);
     
             if (partial.length)
-                partial.forEach(p => {
-                    console.log(`match for partial found: ${p.createdBy.email}`);
-                    sendEmail(p.createdBy.email, "Animal hotlist description matched.", makeBody(animalDoc));
+                partial.forEach(async p => {
+                    var body = await makeBody(animalDoc)
+                    if (process.env.NODE_ENV !== "test") sendEmail(p.createdBy.email, "Animal hotlist description matched.", body);
                 });
     
             const newAnimal = await animalDoc.save();
