@@ -62,7 +62,6 @@ module.exports = {
         findAnimals: async (_, { params }) => {
             console.log("findAnimals called");
             console.dir(params);
-            // remove falsey properties
             Object.keys(params).forEach(k => params[k] == false && delete params[k]);
             return Animal.find(params);
         },
@@ -122,7 +121,7 @@ module.exports = {
             if (partial.length)
                 partial.forEach(async p => {
                     var body = await makeBody(vehicleDoc)
-                    sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
+                    if (process.env.NODE_ENV !== "test") sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
                 });
     
             const newVehicle = await vehicleDoc.save();
@@ -141,8 +140,8 @@ module.exports = {
     
         createNeighborhood: async (_, args, { user }) => {
             if (!user) throw new Error("authentication needed");
-            const neighborhoodDoc = new Neighborhood(args);
-            return neighborhoodDoc.save();
+            const neighborhoodDoc = await Neighborhood.create(args);
+            return neighborhoodDoc;
         },
     
         createAnimal: async (_, { animal }, { user }) => {
@@ -181,7 +180,7 @@ module.exports = {
         },
 
         addPrivilege: async (_, { email }, { user }) => {
-            console.log(email, user);
+            if (!user) throw new Error("Authentication needed");
             const author = await User.findById(user.sub);
             if (!author || author.role !== "ADMIN") throw new Error("You are missing or have invalid credentials.");
     
