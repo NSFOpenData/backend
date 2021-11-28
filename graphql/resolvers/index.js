@@ -93,7 +93,6 @@ module.exports = {
     
     
         me: async (_, args, {user}) => {
-            console.log(user);
             const found = await User.findById(user.sub).populate("neighborhood");
             if (!found) throw new Error("User not found.");
             return found;

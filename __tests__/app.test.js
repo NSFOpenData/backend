@@ -3,19 +3,23 @@ const Neighborhood = require("../models/neighborhood");
 const User = require("../models/user");
 const resolvers = require("../graphql/resolvers");
 
+
+const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
+
 const user = {
   name: "salomon",
   email: "salomondushimirimana@gmail.com",
   neighborhood: "Sylvan Park",
   role: "USER"
 }
-const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
 
-
-beforeAll(async () => {
+beforeEach(async () => {
   await connectTestDB();
-  // await dropTestDB();
-})
+});
+
+afterEach(async () => {
+  await dropTestDB();
+});
 
 afterAll(async () => {
   await dropTestDB();
@@ -25,17 +29,8 @@ afterAll(async () => {
 // USER TESTS
 describe('Register a new user', () => {
   it('should register a new user', async () => {
-    
-    await Neighborhood.create({
-      name: "Sylvan Park",
-      location: {
-        lat: "36.1430",
-        lon: "-86.8446",
-        name: "Sylvan Park"
-      },
-      dataRetention: "7d",
-    });
-
+  
+    user.neighborhood = "Sylvan Park";
     const data = await resolvers.Mutation.register(null, { user });
     
     const userFromDB = await User.findOne({ name: user.name, email: user.email });
@@ -81,7 +76,7 @@ describe('Tests all queries and mutations related to an Animal', () => {
         expect(animal.breed).toBe(partialAnimal.breed);
         expect(animal.type).toBe(partialAnimal.type);       
     })
-    it('creating an animal with a non authenticated user should expect an error', async () => {
+    it('creating an animal with a non authenticated user expects an error', async () => {
 
       const partialAnimal = {
         neighborhood: "Sylvan Park",
