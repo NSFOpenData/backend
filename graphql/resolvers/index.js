@@ -111,9 +111,8 @@ module.exports = {
         const vehicleDoc = new Vehicle(vehicle);
         if (partial.length)
             partial.forEach(async p => {
-                var body = await makeBody(vehicleDoc);
-                console.log("email body", body);
-                sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
+                var {htmlBody, attachments} = await makeBody(vehicleDoc);
+                sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", htmlBody, attachments);
             });
 
         const newVehicle = await vehicleDoc.save();
@@ -199,6 +198,7 @@ module.exports = {
         if (!neighborhoodFound) throw new Error(`Neighborhood with name ${neighborhood} not found`);
 
         const user = new User({
+            // _id: args.user.id,
             name,
             email,
             role: "USER",
