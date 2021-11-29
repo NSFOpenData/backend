@@ -30,7 +30,7 @@ const connectTestDB = async () => {
 };
 
 const dropTestDB = async () => {
-  if (process.env.NODE_ENV === 'test') { // todo: do not understand NODE_ENV
+  if (process.env.NODE_ENV === 'test') { // todo: DNA 
     await mongoose.connection.db.dropDatabase().catch(err => console.log(err));
   }
 }

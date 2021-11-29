@@ -1,6 +1,8 @@
-import { connectTestDB, dropTestDB, closeDBConnection } from '../tests/connection';
+import { connectTestDB, dropTestDB, closeDBConnection } from '../tests_helper/connection';
 const Neighborhood = require("../models/neighborhood");
 const User = require("../models/user");
+const { Animal }= require("../models/animal");
+const { Vehicle }= require("../models/vehicle");
 const resolvers = require("../graphql/resolvers");
 
 
@@ -69,7 +71,7 @@ describe('Tests queries and mutuations related to a user', () => {
 });
 
 // ANIMAL TESTS
-describe('Tests all queries and mutations related to an Animal', () => {
+describe('Tests all mutations related to an Animal', () => {
     it('creating a partial animal with an authenticated user', async () => {
         
         const userFromDb = await User.findOne({ email: user.email });
@@ -151,7 +153,7 @@ describe('Tests all queries and mutations related to an Animal', () => {
           
           const userFromDb = await User.findOne({ email: user.email });
   
-          const newAnimal = {
+          var newAnimal = {
                   neighborhood: "Sylvan Park",
                   color: "red",
                   breed: "Labrador Retriever",
@@ -173,9 +175,136 @@ describe('Tests all queries and mutations related to an Animal', () => {
           expect(animal.type).toBe(newAnimal.type);
     });
 });
+describe('Tests all queries related to an Animal', () => {
+    it('getting all animals from a neighborhood with authenticated users: DEVELOPER and non-developer', async () => {
+      // add 3 animals to the database with same neighborhood
+      var animalsInput = [
+        {
+          neighborhood: "Sylvan Park",
+          color: "red",
+          breed: "persian",
+          type: "Dog",
+          location: {
+            lat: "36.1430",
+            lon: "-86.8446",
+            name: "Sylvan Park"
+          },
+          files: [],
+        },
+        {
+          neighborhood: "Sylvan Park",
+          color: "white",
+          breed: "German Shepherd",
+          type: "Dog",
+          location: {
+            lat: "36.1430",
+            lon: "-86.8446",
+            name: "Sylvan Park"
+          },
+          files: [],
+        },
+        {
+          neighborhood: "12th South",
+          color: "grey",
+          breed: "bulldog",
+          type: "Dog",
+          location: {
+            lat: "36.125382912389945",
+            lon: "-86.78956484629505",
+            name: "12th South"
+          },
+          files: [],
+        }
+      ]
+        
+      // insert animals into database
+      for (let i = 0; i < animalsInput.length; i++) {
+        await Animal.create(animalsInput[i]);
+      }
 
+
+      const userFromDb = await User.findOne({ email: user.email });
+
+      // since the user's role is not a deveoper, they get animals within their neighborhood
+      authUser.sub = userFromDb._id;
+      const animals = await resolvers.Query.animals(null, {}, { user: authUser });
+      expect(animals.length).toBe(2);
+
+      // since the user's role is a developer, they get all animals within their neighborhood
+      authUser[DOMAIN].role = "DEVELOPER";
+      const animals2 = await resolvers.Query.animals(null, {}, { user: authUser });
+
+      expect(animals2.length).toBe(3);
+    });
+    it('getting all animals from a neighborhood with an unauthenticated user', async () => {
+      try {
+        await resolvers.Query.animals(null, {}, {});
+      } catch (error) {
+        expect(typeof error.message).toBe("string");
+      }
+    });
+    it("getting all animals with specific filters", async () => {
+
+      var animalsInput = [
+        {
+          neighborhood: "Sylvan Park",
+          color: "red",
+          breed: "persian",
+          type: "Dog",
+          location: {
+            lat: "36.1430",
+            lon: "-86.8446",
+            name: "Sylvan Park"
+          },
+          files: [],
+        },
+        {
+          neighborhood: "Sylvan Park",
+          color: "white",
+          breed: "German Shepherd",
+          type: "Dog",
+          location: {
+            lat: "36.1430",
+            lon: "-86.8446",
+            name: "Sylvan Park"
+          },
+          files: [],
+        },
+        {
+          neighborhood: "12th South",
+          color: "grey",
+          breed: "bulldog",
+          type: "Dog",
+          location: {
+            lat: "36.125382912389945",
+            lon: "-86.78956484629505",
+            name: "12th South"
+          },
+          files: [],
+        }
+      ]
+        
+      // insert animals into database
+      for (let i = 0; i < animalsInput.length; i++) {
+        await Animal.create(animalsInput[i]);
+      }
+
+      const userFromDb = await User.findOne({ email: user.email });
+      authUser.sub = userFromDb._id;
+      const animals = await resolvers.Query.findAnimals(null, {
+        params : {
+          neighborhood: "Sylvan Park",
+          color: "white",
+          breed: "German Shepherd",
+          type: "Dog"
+        }
+      });
+
+      expect(animals.length).toBe(1);
+    });
+  });
 // VEHICLE TESTS
-describe('Tests all queries and mutations related to a Vehicle', () => {
+describe('Tests all mutations related to a Vehicle', () => {
   it('creating a partial vehicle with an authenticated user', async () => {
       
       const userFromDb = await User.findOne({ email: user.email });
@@ -274,9 +403,137 @@ describe('Tests all queries and mutations related to a Vehicle', () => {
           expect(vehicle.model).toBe(newVehicle.model);
     });
 });
+describe('Tests all queries related to a Vehicle', () => {
+  it('getting all vehicles from a neighborhood with authenticated users: DEVELOPER and non-developer', async () => {
+    
+    var vehiclesInput = [
+      {
+        neighborhood: "Sylvan Park",
+        color: "red",
+        make: "Toyota",
+        model: "Corolla",
+        files: [],
+        location: {
+          lat: "36.1430",
+          lon: "-86.8446",
+          name: "Sylvan Park"
+        }
+      },
+      {
+        neighborhood: "Sylvan Park",
+        color: "yellow",
+        make: "Range",
+        model: "Evoque",
+        files: [],
+        location: {
+          lat: "36.1430",
+          lon: "-86.8446",
+          name: "Sylvan Park"
+        }
+      },
+      {
+        neighborhood: "12th South",
+        color: "grey",
+        make: "Mercedez",
+        model: "C300",
+        files: [],
+        location: {
+          lat: "36.125382912389945",
+          lon: "-86.78956484629505",
+          name: "12th South"
+        }
+      }
+    ]
+
+    // insert vehicles into database
+    for (let i = 0; i < vehiclesInput.length; i++) {
+      await Vehicle.create(vehiclesInput[i]);
+    }
+
+    const userFromDb = await User.findOne({ email: user.email });
+    authUser.sub = userFromDb._id;
+    
+    // since the user's role is not a deveoper, they get vehicles within their neighborhood
+    authUser[DOMAIN].role = "PRIVILEGED";
+    const vehicles = await resolvers.Query.vehicles(null, {}, { user: authUser });
+    expect(vehicles.length).toBe(2);
+
+    // since the user's role is a developer, they get all vehicles
+    authUser[DOMAIN].role = "DEVELOPER";
+    const vehicles2 = await resolvers.Query.vehicles(null, {}, { user: authUser });
+    expect(vehicles2.length).toBe(3);
+  }); 
+  it('getting all vehicles from a neighborhood with non authenticated users: expects an error', async () => {
+    try {
+      await resolvers.Query.vehicles(null, {}, {});
+    } catch (error) {
+      expect(typeof error.message).toBe("string");
+    }
+  });
+  it('getting all vehicles with specific filters', async () => {
+    var vehiclesInput = [
+      {
+        neighborhood: "Sylvan Park",
+        color: "red",
+        make: "Toyota",
+        model: "Corolla",
+        files: [],
+        location: {
+          lat: "36.1430",
+          lon: "-86.8446",
+          name: "Sylvan Park"
+        }
+      },
+      {
+        neighborhood: "Sylvan Park",
+        color: "yellow",
+        make: "Range",
+        model: "Evoque",
+        files: [],
+        location: {
+          lat: "36.1430",
+          lon: "-86.8446",
+          name: "Sylvan Park"
+        }
+      },
+      {
+        neighborhood: "12th South",
+        color: "grey",
+        make: "Mercedez",
+        model: "C300",
+        files: [],
+        location: {
+          lat: "36.125382912389945",
+          lon: "-86.78956484629505",
+          name: "12th South"
+        }
+      }
+    ]
+
+    // insert vehicles into database
+    for (let i = 0; i < vehiclesInput.length; i++) {
+      await Vehicle.create(vehiclesInput[i]);
+    }
+
+    const userFromDb = await User.findOne({ email: user.email });
+    authUser.sub = userFromDb._id;
+
+    const vehicles = await resolvers.Query.findVehicles(null, {
+      params : {
+        neighborhood: "12th South",
+        color: "grey",
+        make: "Mercedez",
+        model: "C300"
+      }
+    });
+
+    expect(vehicles.length).toBe(1);
+  });
+});
+
 
 // NEIGHBORHOOD TESTS
-describe('Tests all queries and mutations related to a Neighborhood', () => {
+describe('Tests all mutations and queries related to a Neighborhood', () => {
   it('creating a neighborhood with an authenticated user', async () => {
       
       const userFromDb = await User.findOne({ email: user.email });
@@ -284,11 +541,11 @@ describe('Tests all queries and mutations related to a Neighborhood', () => {
       const newNeighborhood = {
               name: "Vanderbilt",
               location: {
-                  lat: "36.14455609440181",
-                  lon: "-86.80260145836806",
+                  lat: "36.14455",
+                  lon: "-86.8026",
                   name: "Vanderbilt"
               },
-              dataRetention: "7d"
+              dataRetention: "7d",
       }
 
       authUser.sub = userFromDb._id;
@@ -317,6 +574,62 @@ describe('Tests all queries and mutations related to a Neighborhood', () => {
     }
   })
 });
+describe("Tests all queries made to the addPrivilege mutation", () => {
+  it("adding a privilege with a non authenticated user throws an error", async () => {
+    try {
+      await resolvers.Mutation.addPrivilege(null, {}, {});
+    } catch (error) {
+      expect(typeof error.message).toBe("string");
+    }
+  });
+  it("adding a privilege with a non ADMIN user throws an error", async () => {
+    const userFromDb = await User.findOne({ email: user.email });
+    authUser.sub = userFromDb._id;
+    authUser[DOMAIN].role = "PRIVILEGED";
+
+    try {
+      await resolvers.Mutation.addPrivilege(null, {}, { user: authUser });
+    } catch (error) {
+      expect(typeof error.message).toBe("string");
+    }
+  });
+  it("adding a privilege to a nonvalid user with an ADMIN user throws an error", async () => {
+    const userFromDb = await User.findOne({ email: user.email });
+    userFromDb.role = "ADMIN";
+    await userFromDb.save();
+
+    authUser.sub = userFromDb._id;
+    authUser[DOMAIN].role = "ADMIN";
+
+    try {
+      await resolvers.Mutation.addPrivilege(null, {email: "nonvalidemail@gmail.com"}, { user: authUser });
+    } catch (error) {
+      expect(typeof error.message).toBe("string");
+    }
+  });
+  it("adding a privilege with an ADMIN user works", async () => {
+    const userFromDb = await User.findOne({ email: user.email });
+    userFromDb.role = "ADMIN";
+    await userFromDb.save();
+
+    authUser.sub = userFromDb._id;
+    authUser[DOMAIN].role = "ADMIN";
+
+    // create a new user
+    const newUser = await User.create({
+      email: "facebookworker@fb.com",
+      name: "fbworker",
+      neighborhood: userFromDb.neighborhood,
+      role: "USER"
+    });
+
+    await resolvers.Mutation.addPrivilege(null, { email: newUser.email }, { user: authUser });
+
+    const updatedUser = await User.findOne({ email: newUser.email });
+    expect(updatedUser.role).toBe("PRIVILEGED");
+  });
+});
+
 
 
 // TODO: partials for vehicle and animal should not be empty

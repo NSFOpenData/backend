@@ -30,8 +30,8 @@ module.exports = {
         vehicles: async (_, args, { user }) => {
             if (!user) throw new Error("Authentication needed");
             const { role, neighborhood } = user[DOMAIN];
-            if (role === "DEVELOPER") return Vehicle.find();
-    
+            if (role === "DEVELOPER") return Vehicle.find({});
+            
             const vehiclesFetched = await Vehicle.find({ neighborhood });
             return vehiclesFetched.map(vehicle => {
                 // check if role has permissions
@@ -43,7 +43,7 @@ module.exports = {
         animals: async (_, args, { user }) => {
             if (!user) throw new Error("Authentication needed");
             const { role, neighborhood } = user[DOMAIN];
-            if (role === "DEVELOPER") return Animal.find();
+            if (role === "DEVELOPER") return Animal.find({});
             return Animal.find({ neighborhood });
         },
     
@@ -52,16 +52,11 @@ module.exports = {
         },
     
         findVehicles: async (_, { params }) => {
-            console.log("findVehicles called");
-            console.dir(params);
-            // remove falsey properties
             Object.keys(params).forEach(k => params[k] == false && delete params[k]);
             return Vehicle.find(params);
         },
     
         findAnimals: async (_, { params }) => {
-            console.log("findAnimals called");
-            console.dir(params);
             Object.keys(params).forEach(k => params[k] == false && delete params[k]);
             return Animal.find(params);
         },
@@ -140,7 +135,7 @@ module.exports = {
     
         createNeighborhood: async (_, args, { user }) => {
             if (!user) throw new Error("authentication needed");
-            const neighborhoodDoc = await Neighborhood.create(args);
+            const neighborhoodDoc = await Neighborhood.create(args.neighborhood);
             return neighborhoodDoc;
         },
     
