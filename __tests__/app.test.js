@@ -41,7 +41,7 @@ afterAll(async () => {
 
 // USER TESTS
 describe('Tests queries and mutuations related to a user', () => {
-  it('should register a new user', async () => {
+  it('registering a new user', async () => {
   
     user.neighborhood = "Sylvan Park";
     const data = await resolvers.Mutation.register(null, { user });
@@ -53,14 +53,14 @@ describe('Tests queries and mutuations related to a user', () => {
     expect(data.email).toBe(userFromDB.email);
     expect(userFromDB.role).toBe("USER");
   });
-  it ('requesting a user from the me resolver with authenticated user', async () => {
+  it ('getting a user from the me resolver with authenticated user', async () => {
     const userFromDb = await User.findOne({ email: user.email });
 
     authUser.sub = userFromDb._id;
     const data = await resolvers.Query.me(null, null, { user: authUser });
     expect(data.name).toBe(user.name);
   });
-  it ('requesting a user from the me resolver with unauthenticated throws error', async () => {
+  it ('getting a user from the me resolver with unauthenticated throws error', async () => {
     
     try {
       await resolvers.Query.me(null, null, { user: {} });
@@ -574,7 +574,7 @@ describe('Tests all mutations and queries related to a Neighborhood', () => {
     }
   })
 });
-describe("Tests all queries made to the addPrivilege mutation", () => {
+describe("Tests all mutations made to the addPrivilege mutation", () => {
   it("adding a privilege with a non authenticated user throws an error", async () => {
     try {
       await resolvers.Mutation.addPrivilege(null, {}, {});
@@ -629,8 +629,4 @@ describe("Tests all queries made to the addPrivilege mutation", () => {
     expect(updatedUser.role).toBe("PRIVILEGED");
   });
 });
-
-
-
 // TODO: partials for vehicle and animal should not be empty
-
