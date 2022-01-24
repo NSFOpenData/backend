@@ -91,6 +91,16 @@ module.exports = {
             if (!found) throw new Error("User not found.");
             return found;
         },
+
+        /**
+         * Checks if the user with the given email is in the database.
+         * @param {String} email - email of the user
+         * @returns True if user is found, false otherwise
+         */
+         isRegistered: async (_, { email }) => {
+            const user = await User.findOne({ email: email }).populate("neighborhood");
+            return !!user; // returns true if user is found
+        },
     },
 
     Mutation: {
@@ -249,14 +259,6 @@ module.exports = {
             return { token, user };
         },
 
-        /**
-         * Checks if the user with the given email is in the database.
-         * @param {String} email - email of the user
-         * @returns True if user is found, false otherwise
-         */
-        isRegistered: async ({ email }) => {
-            const user = await User.findOne({ email: email }).populate("neighborhood");
-            return !!user; // returns true if user is found
-        },
+        
     }
 };
