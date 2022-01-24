@@ -120,7 +120,9 @@ app.post("/upload", upload.array("images"), async (req, res) => {
     let uploads = [];
     try {
         for (let file of req.files) {
+            console.log("file", file);
             const { originalname: name, buffer } = file;
+            // console.log("original buffer: ", buffer);
             const prefix = `${type}/${id}`;
 
             const status = await uploadFile(prefix, name, buffer);

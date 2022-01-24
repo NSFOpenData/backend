@@ -20,7 +20,7 @@ admin.initializeApp({
     storageBucket: "nsfopendata.appspot.com",
     messagingSenderId: "534112304877",
     appId: "1:534112304877:web:82adc6a18d014a931cd6e4",
-    measurementId: "G-67PGJ786CW"
+    measurementId: "G-67PGJ786CW",
 });
 
 module.exports = {
@@ -201,7 +201,8 @@ module.exports = {
             const newUser = await user.save().then(u => u.populate("neighborhood"));
             return newUser;
         },
-    
+
+
         /**
          * Logs the user in or redirects if not registered.
          * Note: to pass in the actual idToken, call the user.getIdToken() method
@@ -212,33 +213,22 @@ module.exports = {
             // verify the token
             // idToken comes from the client app
             var token = " ";
-            var isRegistered = true;
-    
+
             admin
                 .auth()
                 .verifyIdToken(idToken)
                 .then(decodedToken => {
                     const uid = decodedToken.uid;
                     console.log("UID:  ", uid); // todo: delete this line after testing
-                    // ...
                 })
                 .catch(error => {
                     // Handle error
-    
+
                     throw new Error(error);
                 });
-    
-            // if the user is in our database, log him in
-            // else, redirect to sign up page to provide further information
+
             const user = await User.findOne({ email: email }).populate("neighborhood");
-    
-            // if the user is not registered, return empty token and false registration
-            if (!user) {
-                isRegistered = false;
-                return { isRegistered, token };
-            }
-    
-            console.log("User logged in:", user, new Date());
+
             const { id, role, neighborhood } = user;
             // eslint-disable-next-line no-const-assign
             token = jwt.sign(
@@ -256,8 +246,17 @@ module.exports = {
                     expiresIn: "7d",
                 }
             );
-            console.log("Token: ", token);
-            return { isRegistered, token, user };
+            return { token, user };
+        },
+
+        /**
+         * Checks if the user with the given email is in the database.
+         * @param {String} email - email of the user
+         * @returns True if user is found, false otherwise
+         */
+        isRegistered: async ({ email }) => {
+            const user = await User.findOne({ email: email }).populate("neighborhood");
+            return !!user; // returns true if user is found
         },
     }
 };

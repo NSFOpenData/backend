@@ -160,7 +160,6 @@ module.exports = buildSchema(`
     }
 
     type LoginPayload {
-        isRegistered: Boolean!
         token: String!
         user: User
     }
@@ -184,6 +183,7 @@ module.exports = buildSchema(`
         createPartialVehicle(partial: PartialVehicleInput!): PartialVehicle!
         register(user: RegistrationInput): User!
         login(idToken: String!, email: String!): LoginPayload!
+        isRegistered(email: String!): Boolean!
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
     }
