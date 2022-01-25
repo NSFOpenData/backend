@@ -39,7 +39,7 @@
         "apollo-server-testing": "^2.25.3",
         "bcryptjs": "^2.4.3",
         "cors": "^2.8.5",
-        "dotenv": "^10.0.0",
+        "dotenv": "^14.3.0",
         "eslint-plugin-jest": "^25.2.4",
         "express": "^4.17.1",
         "express-graphiql-middleware": "^1.0.4",
