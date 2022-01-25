@@ -31,7 +31,7 @@ module.exports = {
             if (!user) throw new Error("Authentication needed");
             const { role, neighborhood } = user[DOMAIN];
             if (role === "DEVELOPER") return Vehicle.find({});
-            
+
             const vehiclesFetched = await Vehicle.find({ neighborhood });
             return vehiclesFetched.map(vehicle => {
                 // check if role has permissions
@@ -39,41 +39,41 @@ module.exports = {
                 return vehicle;
             });
         },
-    
+
         animals: async (_, args, { user }) => {
             if (!user) throw new Error("Authentication needed");
             const { role, neighborhood } = user[DOMAIN];
             if (role === "DEVELOPER") return Animal.find({});
             return Animal.find({ neighborhood });
         },
-    
+
         neighborhoods: async () => {
             return Neighborhood.find();
         },
-    
+
         findVehicles: async (_, { params }) => {
             Object.keys(params).forEach(k => params[k] == false && delete params[k]);
             return Vehicle.find(params);
         },
-    
+
         findAnimals: async (_, { params }) => {
             Object.keys(params).forEach(k => params[k] == false && delete params[k]);
             return Animal.find(params);
         },
-    
+
         nearestNeighborhood: async (_, { location }) => {
             const locations = await Neighborhood.find();
             const points = locations.map(n => n.location); // create array of locations
-    
+
             const nearest = geolib.findNearest(location, points);
             const neighborhood = locations.find(e => e.location === nearest);
             return neighborhood;
         },
-    
+
         // a function that uploads a file given name and stream
         // uploadFile: async ({ stream, filename }) => {
         //     const path = `images/${shortid.generate()}-${filename}`;
-    
+
         //     return new Promise((resolve, reject) =>
         //         stream
         //             .pipe(fs.createWriteStream(path))
@@ -84,9 +84,8 @@ module.exports = {
         getUniqueID: async () => {
             return uuid.v4();
         },
-    
-    
-        me: async (_, args, {user}) => {
+
+        me: async (_, args, { user }) => {
             const found = await User.findById(user.sub).populate("neighborhood");
             if (!found) throw new Error("User not found.");
             return found;
@@ -100,7 +99,7 @@ module.exports = {
             const { lat, lon, name } = vehicle.location;
             if (!name) vehicle.location.name = await getLocation(lat, lon);
             if (!vehicle.neighborhood) vehicle.neighborhood = user[DOMAIN].neighborhood;
-    
+
             const { neighborhood, color, make, model, license } = vehicle;
             const partial = await PartialVehicle.find({
                 neighborhood,
@@ -109,42 +108,43 @@ module.exports = {
                 model,
                 ...(license && { license }), // include license only if supplied
             }).populate("createdBy");
-    
+
             // creates a Vehicle object from passed in vehicle info including images
             const vehicleDoc = new Vehicle(vehicle);
             console.log("partial", partial);
             if (partial.length)
                 partial.forEach(async p => {
-                    var body = await makeBody(vehicleDoc)
-                    if (process.env.NODE_ENV !== "test") sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
+                    var body = await makeBody(vehicleDoc);
+                    if (process.env.NODE_ENV !== "test")
+                        sendEmail(p.createdBy.email, "Vehicle hotlist description matched.", body);
                 });
-    
+
             const newVehicle = await vehicleDoc.save();
             return newVehicle;
         },
-    
+
         createPartialVehicle: async (_, { partial }, { user }) => {
             if (!user) throw new Error("Authentication needed");
             const { neighborhood, role } = user[DOMAIN];
             if (role === "USER") throw new Error("Need to be at least a privileged user.");
             const partialVehicleDoc = new PartialVehicle({ createdBy: user.sub, neighborhood, ...partial });
             const partialVehicle = await partialVehicleDoc.save().then(a => a.populate("createdBy"));
-    
+
             return partialVehicle;
         },
-    
+
         createNeighborhood: async (_, args, { user }) => {
             if (!user) throw new Error("authentication needed");
             const neighborhoodDoc = await Neighborhood.create(args.neighborhood);
             return neighborhoodDoc;
         },
-    
+
         createAnimal: async (_, { animal }, { user }) => {
             if (!user) throw new Error("Authentication needed");
             const { lat, lon, name } = animal.location;
             if (!name) animal.location.name = await getLocation(lat, lon);
             if (!animal.neighborhood) animal.neighborhood = user[DOMAIN].neighborhood;
-    
+
             const { breed, color, type, neighborhood } = animal;
             const partial = await PartialAnimal.find({
                 breed,
@@ -152,19 +152,20 @@ module.exports = {
                 type,
                 neighborhood,
             }).populate("createdBy");
-    
+
             const animalDoc = new Animal(animal);
-    
+
             if (partial.length)
                 partial.forEach(async p => {
-                    var body = await makeBody(animalDoc)
-                    if (process.env.NODE_ENV !== "test") sendEmail(p.createdBy.email, "Animal hotlist description matched.", body);
+                    var body = await makeBody(animalDoc);
+                    if (process.env.NODE_ENV !== "test")
+                        sendEmail(p.createdBy.email, "Animal hotlist description matched.", body);
                 });
-    
+
             const newAnimal = await animalDoc.save();
             return newAnimal;
         },
-    
+
         // to create descriptions that can be matched against to alert the user
         createPartialAnimal: async (_, { partial }, { user }) => {
             if (!user) throw new Error("Authentication needed");
@@ -178,20 +179,20 @@ module.exports = {
             if (!user) throw new Error("Authentication needed");
             const author = await User.findById(user.sub);
             if (!author || author.role !== "ADMIN") throw new Error("You are missing or have invalid credentials.");
-    
+
             const found = await User.findOne({ email: email });
             if (!found) throw new Error("No user found for that email.");
-    
+
             found.role = "PRIVILEGED";
             await found.save();
             return `${found.name} has been given access privileges.`;
         },
-    
+
         register: async (_, args) => {
             const { name, email, neighborhood } = args.user;
             const neighborhoodFound = await Neighborhood.findOne({ name: neighborhood });
             if (!neighborhoodFound) throw new Error(`Neighborhood with name ${neighborhood} not found`);
-    
+
             const user = new User({
                 name,
                 email,
@@ -201,7 +202,6 @@ module.exports = {
             const newUser = await user.save().then(u => u.populate("neighborhood"));
             return newUser;
         },
-
 
         /**
          * Logs the user in or redirects if not registered.
@@ -254,9 +254,9 @@ module.exports = {
          * @param {String} email - email of the user
          * @returns True if user is found, false otherwise
          */
-         isRegistered: async (_, { email }) => {
+        isRegistered: async (_, { email }) => {
             const user = await User.findOne({ email: email }).populate("neighborhood");
             return !!user; // returns true if user is found
         },
-    }
+    },
 };
