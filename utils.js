@@ -1,23 +1,59 @@
 const fetch = require("node-fetch");
 const nodemailer = require("nodemailer");
+const { getFile } = require("./swift");
 
 /**
  * Create html body to send in emails
  * @param {*} obj Animal or Vehicle object to get info from
  * @returns formatted html string email body
  */
-const makeBody = obj => {
+const makeBody = async obj => {
     let item = { ...obj }; // objects are passed by ref in js so we make a copy
-    const model = item.constructor.modelName; // check if Animal or Vehicle
-    console.log(delete item._doc.files);
-    console.log(delete item._doc._id);
-    const { location } = item;
-    const locationURL = "https://www.google.com/maps/search/?api=1&query=" + location.lat + "," + location.lon;
+    const model = item._doc.make; // get the model name
+    const locationURL = "https://www.google.com/maps/search/?api=1&query=" + item._doc.location.lat + "," + item._doc.location.lon;
 
-    console.log(delete item._doc.location);
-    console.log(item);
     const article = model === "Animal" ? "An" : "A";
-    return `<p>${article} ${model} matching your description has been found with the following details:</p><br><p>Location: ${locationURL}</p><br><p>${item}</p>`;
+    var attachments = []
+
+    const buildImages = async allFiles => {
+        let images = "";
+        for (let i = 0; i < allFiles.length; i++) {
+            let file = allFiles[i];
+            // get file from swift
+            var fileArr = file.split("/");
+            var fileName = fileArr[2];
+            var prefix = fileArr[0] + "/" + fileArr[1];
+
+            // get image and buffer it
+            const data = await getFile(prefix, fileName);
+            const arrayBuffer = await data.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            attachments.push({
+                filename: fileName,
+                content: buffer,
+                cid: fileArr[1]
+            })
+            
+            // add image to html
+            images += `<img src="cid:${fileArr[1]}" alt="${fileName}"/>`;
+        }
+        return images;
+    };
+
+    // return html with image and info
+    // build htmls images from files
+    let images = "";
+    if (item._doc.files) {
+        images = await buildImages(item._doc.files);
+    }
+    var htmlBody = `
+        <h1>${article} ${model} matching your description has been found with the following details</h1><br>
+        ${images} <br>
+        <p>Location: <a href="${locationURL}">${item._doc.location.name}</a></p>
+        `;
+
+    return { htmlBody, attachments };
 };
 
 /**
@@ -26,7 +62,7 @@ const makeBody = obj => {
  * @param {String} subject the email subject
  * @param {String} bodyHtml html body
  */
-const sendEmail = (recipient, subject, bodyHtml) => {
+const sendEmail = (recipient, subject, bodyHtml, attachments={}) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.isis.vanderbilt.edu",
         port: 25,
@@ -42,6 +78,7 @@ const sendEmail = (recipient, subject, bodyHtml) => {
             to: recipient,
             subject: subject,
             html: bodyHtml,
+            attachments: attachments
         },
         function (err) {
             if (err) {
@@ -52,6 +89,7 @@ const sendEmail = (recipient, subject, bodyHtml) => {
         }
     );
 };
+
 
 /**
  * reverse coordinate lookup to figure out an approximate street

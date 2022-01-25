@@ -14,6 +14,10 @@ const graphqlResolvers = require("./graphql/resolvers");
 const { uploadFile, getFile } = require("./swift");
 const { Animal } = require("./models/animal");
 const { Vehicle } = require("./models/vehicle");
+const uuid = require("uuid");
+
+const  { makeExecutableSchema } =  require('@graphql-tools/schema');
+
 
 require("dotenv").config();
 const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
@@ -23,6 +27,8 @@ Sentry.init({ dsn: SENTRY_URL });
 const app = express();
 
 app.use(Sentry.Handlers.requestHandler());
+
+app.use(cors());
 
 const html = `
 <!DOCTYPE html>
@@ -40,6 +46,11 @@ const html = `
     </body>
 </html>
 `;
+
+const schema = makeExecutableSchema({
+    typeDefs: graphqlSchema,
+    resolvers: graphqlResolvers,
+});
 
 app.get("/", (req, res) => {
     res.send(html);
@@ -61,7 +72,6 @@ const upload = multer({ storage: storage });
  * @returns the object if found else null
  */
 const checkValidID = async (id, item) => {
-    console.log(`checking valid id for id: ${id} and item: ${item}`);
     item = item.toLowerCase();
     // map to the database model
     const object = {
@@ -72,48 +82,8 @@ const checkValidID = async (id, item) => {
     if (!Object.prototype.hasOwnProperty.call(object, item)) return false;
 
     const found = await object[item].findById(id);
-    console.log(found);
     return found;
 };
-
-app.post("/upload", upload.array("images"), async (req, res) => {
-    let summary = "";
-    let item = "";
-    const { id, type } = req.body;
-
-    if (!id || !type) res.status(400).send("both type and id fields required");
-
-    // check valid id
-    item = await checkValidID(id, type);
-    if (!item) res.status(404).send(`no ${type} with that id found, type or id might be incorrect`);
-
-    // do the uploads
-    try {
-        let uploads = [];
-        for (let file of req.files) {
-            const { originalname: name, buffer } = file;
-            const prefix = `${type}/${id}`;
-            if (item.files.includes(name)) {
-                summary += `file exists with name: ${prefix}/${name}, skipping... <br>`;
-                continue;
-            }
-            const status = await uploadFile(prefix, name, buffer);
-            if (status === 201) {
-                summary += `${prefix}/${name} created successfully<br>`;
-                uploads.push(name);
-            } else summary += `${name} bugged with status ${status}\n`;
-        }
-        // update the files field in the object
-        if (item.files) item.files.push(...uploads);
-        else item.files = uploads;
-        console.log(item);
-        await item.save();
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-    return res.send(summary);
-});
 
 // endpoint to get images from the server
 app.get("/file/:type/:id/:filename", async (req, res) => {
@@ -134,32 +104,62 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
     }
 });
 
-app.use(Sentry.Handlers.errorHandler());
+app.post("/upload", upload.array("images"), async (req, res) => {
+    let summary = "";
+    let item = "";
 
-app.use(cors());
+    const { id, type } = req.body;
+
+    if (!id || !type) res.status(400).send("both type and id fields required");
+
+    // check valid id
+    item = await uuid.validate(id);
+    if (!item) res.status(404).send(`Invalid uuid provided`);
+
+    // do the uploads
+    let uploads = [];
+    try {
+        for (let file of req.files) {
+            console.log("file", file);
+            const { originalname: name, buffer } = file;
+            // console.log("original buffer: ", buffer);
+            const prefix = `${type}/${id}`;
+
+            const status = await uploadFile(prefix, name, buffer);
+            if (status === 201) {
+                summary += `${prefix}/${name} created successfully<br>`;
+                uploads.push(`${prefix}/${name}`);
+            } else summary += `${name} bugged with status ${status}\n`;
+        }
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+    res.status(200).send(uploads.join(","));
+});
+
+app.use(Sentry.Handlers.errorHandler());
 
 app.use(helmet());
 
-app.use(
-    expressJWT({
+app.use(expressJWT({
         secret: JWT_SECRET,
         algorithms: ["HS256"],
         credentialsRequired: false,
-    })
-);
+}));
+
 
 app.use(
     "/graphql",
     graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
     graphqlHTTP({
-        schema: graphqlSchema,
-        rootValue: graphqlResolvers,
+        schema: schema,
         graphiql: true,
     })
 );
 
 const uri = DB;
-const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true };
+const options = {};
 mongoose
     .connect(uri, options)
     .then(() => app.listen(3000, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
