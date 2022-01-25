@@ -173,7 +173,6 @@ module.exports = buildSchema(`
         findAnimals(params: AnimalSearchInput!): [Animal!]
         getUniqueID: String
         me: User
-        isRegistered(email: String!): Boolean!
     }
 
     type Mutation {
@@ -186,6 +185,7 @@ module.exports = buildSchema(`
         login(idToken: String!, email: String!): LoginPayload!
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
+        isRegistered(email: String!): Boolean!
     }
 
     schema {
