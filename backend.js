@@ -16,6 +16,8 @@ const { Animal } = require("./models/animal");
 const { Vehicle } = require("./models/vehicle");
 const uuid = require("uuid");
 
+const { makeExecutableSchema } = require("@graphql-tools/schema");
+
 require("dotenv").config();
 const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
 
@@ -43,6 +45,11 @@ const html = `
     </body>
 </html>
 `;
+
+const schema = makeExecutableSchema({
+    typeDefs: graphqlSchema,
+    resolvers: graphqlResolvers,
+});
 
 app.get("/", (req, res) => {
     res.send(html);
@@ -97,7 +104,6 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
 });
 
 app.post("/upload", upload.array("images"), async (req, res) => {
-    let summary = "";
     let item = "";
 
     const { id, type } = req.body;
@@ -119,9 +125,10 @@ app.post("/upload", upload.array("images"), async (req, res) => {
 
             const status = await uploadFile(prefix, name, buffer);
             if (status === 201) {
-                summary += `${prefix}/${name} created successfully<br>`;
                 uploads.push(`${prefix}/${name}`);
-            } else summary += `${name} bugged with status ${status}\n`;
+            } else {
+                console.log(status);
+            }
         }
     } catch (error) {
         console.log(error);
@@ -146,8 +153,7 @@ app.use(
     "/graphql",
     graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
     graphqlHTTP({
-        schema: graphqlSchema,
-        rootValue: graphqlResolvers,
+        schema: schema,
         graphiql: true,
     })
 );
