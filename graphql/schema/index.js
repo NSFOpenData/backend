@@ -150,19 +150,28 @@ module.exports = buildSchema(`
         neighborhood: String
     } 
 
+    input userInput {
+        """
+        not sure how this will look like yet
+        """
+        name: String
+        email: String
+        neighborhood: String
+    }
+
     type LoginPayload {
         token: String!
         user: User
     }
 
     type Query {
-        vehicles: [Vehicle!]
+        vehicles(user: userInput!): [Vehicle!]
         animals: [Animal!]
         neighborhoods: [Neighborhood!]
         nearestNeighborhood(location: LocationInput!): Neighborhood
         findVehicles(params: VehicleSearchInput!): [Vehicle!]
         findAnimals(params: AnimalSearchInput!): [Animal!]
-        getUniqueID: String!
+        getUniqueID: String
         me: User
     }
 
@@ -174,9 +183,9 @@ module.exports = buildSchema(`
         createPartialVehicle(partial: PartialVehicleInput!): PartialVehicle!
         register(user: RegistrationInput): User!
         login(idToken: String!, email: String!): LoginPayload!
-        isRegistered(email: String!): Boolean!
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
+        isRegistered(email: String!): Boolean!
     }
 
     schema {
