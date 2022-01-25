@@ -150,20 +150,28 @@ module.exports = buildSchema(`
         neighborhood: String
     } 
 
+    input userInput {
+        """
+        not sure how this will look like yet
+        """
+        name: String
+        email: String
+        neighborhood: String
+    }
+
     type LoginPayload {
-        isRegistered: Boolean!
         token: String!
         user: User
     }
 
     type Query {
-        vehicles: [Vehicle!]
+        vehicles(user: userInput!): [Vehicle!]
         animals: [Animal!]
         neighborhoods: [Neighborhood!]
         nearestNeighborhood(location: LocationInput!): Neighborhood
         findVehicles(params: VehicleSearchInput!): [Vehicle!]
         findAnimals(params: AnimalSearchInput!): [Animal!]
-        getUniqueID: String!
+        getUniqueID: String
         me: User
     }
 
@@ -177,6 +185,7 @@ module.exports = buildSchema(`
         login(idToken: String!, email: String!): LoginPayload!
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
+        isRegistered(email: String!): Boolean!
     }
 
     schema {

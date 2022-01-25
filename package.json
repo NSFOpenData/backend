@@ -6,8 +6,20 @@
     "scripts": {
         "start": "node backend.js",
         "populate": "node scripts/populateDB.js",
+        "test": "jest",
         "prod": "env NODE_ENV=production npm start",
         "fmt": "npx prettier -w **/*.js"
+    },
+    "jest": {
+        "testEnvironment": "node",
+        "testPathIgnorePatterns": [
+            "/node_modules/",
+            "./dist"
+        ],
+        "coverageReporters": [
+            "lcov",
+            "html"
+        ]
     },
     "repository": {
         "type": "git",
@@ -20,19 +32,27 @@
     },
     "homepage": "https://github.com/NSFOpenData/backend#readme",
     "dependencies": {
+        "@babel/runtime": "^7.16.3",
         "@sentry/node": "^6.7.2",
+        "apollo-server": "^3.5.0",
+        "apollo-server-express": "^3.5.0",
+        "apollo-server-testing": "^2.25.3",
         "bcryptjs": "^2.4.3",
         "cors": "^2.8.5",
         "dotenv": "^10.0.0",
+        "eslint-plugin-jest": "^25.2.4",
         "express": "^4.17.1",
+        "express-graphiql-middleware": "^1.0.4",
         "express-graphql": "^0.12.0",
         "express-jwt": "^6.0.0",
         "faker": "^5.5.3",
         "firebase": "^9.0.2",
         "firebase-admin": "^9.12.0",
         "geolib": "^3.3.1",
-        "graphql": "^15.5.0",
         "graphql-playground-middleware-express": "^1.7.22",
+        "graphql-request": "^3.6.1",
+        "graphql-shield": "^7.5.0",
+        "graphql-tools": "^8.2.0",
         "graphql-upload": "^12.0.0",
         "helmet": "^4.6.0",
         "jsonwebtoken": "^8.5.1",
@@ -44,7 +64,15 @@
         "uuid": "^8.3.2"
     },
     "devDependencies": {
-        "eslint": "^7.27.0",
+        "@babel/plugin-transform-runtime": "^7.16.4",
+        "@babel/preset-env": "^7.16.4",
+        "@babel/register": "^7.16.0",
+        "apollo-boost": "^0.4.9",
+        "cross-fetch": "^3.1.4",
+        "eslint": "^8.2.0",
+        "graphql": "^15.7.2",
+        "jest": "^27.3.1",
+        "jest-cli": "^27.3.1",
         "prettier": "^2.3.0"
     }
 }

@@ -16,6 +16,9 @@ const { Animal } = require("./models/animal");
 const { Vehicle } = require("./models/vehicle");
 const uuid = require("uuid");
 
+const  { makeExecutableSchema } =  require('@graphql-tools/schema');
+
+
 require("dotenv").config();
 const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
 
@@ -44,6 +47,11 @@ const html = `
 </html>
 `;
 
+const schema = makeExecutableSchema({
+    typeDefs: graphqlSchema,
+    resolvers: graphqlResolvers,
+});
+
 app.get("/", (req, res) => {
     res.send(html);
 });
@@ -64,7 +72,6 @@ const upload = multer({ storage: storage });
  * @returns the object if found else null
  */
 const checkValidID = async (id, item) => {
-    console.log(`checking valid id for id: ${id} and item: ${item}`);
     item = item.toLowerCase();
     // map to the database model
     const object = {
@@ -75,7 +82,6 @@ const checkValidID = async (id, item) => {
     if (!Object.prototype.hasOwnProperty.call(object, item)) return false;
 
     const found = await object[item].findById(id);
-    console.log(found);
     return found;
 };
 
@@ -99,7 +105,6 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
 });
 
 app.post("/upload", upload.array("images"), async (req, res) => {
-    console.log("\n 1 \n");
     let summary = "";
     let item = "";
 
@@ -114,9 +119,10 @@ app.post("/upload", upload.array("images"), async (req, res) => {
     // do the uploads
     let uploads = [];
     try {
-        console.log("\nfiles: ", req.files);
         for (let file of req.files) {
+            console.log("file", file);
             const { originalname: name, buffer } = file;
+            // console.log("original buffer: ", buffer);
             const prefix = `${type}/${id}`;
 
             const status = await uploadFile(prefix, name, buffer);
@@ -125,14 +131,10 @@ app.post("/upload", upload.array("images"), async (req, res) => {
                 uploads.push(`${prefix}/${name}`);
             } else summary += `${name} bugged with status ${status}\n`;
         }
-
-        console.log("summary: ", summary);
     } catch (error) {
         console.log(error);
         throw error;
     }
-    console.log("uploads", uploads);
-
     res.status(200).send(uploads.join(","));
 });
 
@@ -140,20 +142,18 @@ app.use(Sentry.Handlers.errorHandler());
 
 app.use(helmet());
 
-app.use(
-    expressJWT({
+app.use(expressJWT({
         secret: JWT_SECRET,
         algorithms: ["HS256"],
         credentialsRequired: false,
-    })
-);
+}));
+
 
 app.use(
     "/graphql",
     graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
     graphqlHTTP({
-        schema: graphqlSchema,
-        rootValue: graphqlResolvers,
+        schema: schema,
         graphiql: true,
     })
 );
