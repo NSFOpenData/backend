@@ -10,10 +10,11 @@ const { getFile } = require("./swift");
 const makeBody = async obj => {
     let item = { ...obj }; // objects are passed by ref in js so we make a copy
     const model = item._doc.make; // get the model name
-    const locationURL = "https://www.google.com/maps/search/?api=1&query=" + item._doc.location.lat + "," + item._doc.location.lon;
+    const locationURL =
+        "https://www.google.com/maps/search/?api=1&query=" + item._doc.location.lat + "," + item._doc.location.lon;
 
     const article = model === "Animal" ? "An" : "A";
-    var attachments = []
+    var attachments = [];
 
     const buildImages = async allFiles => {
         let images = "";
@@ -32,9 +33,9 @@ const makeBody = async obj => {
             attachments.push({
                 filename: fileName,
                 content: buffer,
-                cid: fileArr[1]
-            })
-            
+                cid: fileArr[1],
+            });
+
             // add image to html
             images += `<img src="cid:${fileArr[1]}" alt="${fileName}"/>`;
         }
@@ -62,7 +63,7 @@ const makeBody = async obj => {
  * @param {String} subject the email subject
  * @param {String} bodyHtml html body
  */
-const sendEmail = (recipient, subject, bodyHtml, attachments={}) => {
+const sendEmail = (recipient, subject, bodyHtml, attachments = {}) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.isis.vanderbilt.edu",
         port: 25,
@@ -78,7 +79,7 @@ const sendEmail = (recipient, subject, bodyHtml, attachments={}) => {
             to: recipient,
             subject: subject,
             html: bodyHtml,
-            attachments: attachments
+            attachments: attachments,
         },
         function (err) {
             if (err) {
@@ -89,7 +90,6 @@ const sendEmail = (recipient, subject, bodyHtml, attachments={}) => {
         }
     );
 };
-
 
 /**
  * reverse coordinate lookup to figure out an approximate street

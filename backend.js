@@ -16,8 +16,7 @@ const { Animal } = require("./models/animal");
 const { Vehicle } = require("./models/vehicle");
 const uuid = require("uuid");
 
-const  { makeExecutableSchema } =  require('@graphql-tools/schema');
-
+const { makeExecutableSchema } = require("@graphql-tools/schema");
 
 require("dotenv").config();
 const { DB, JWT_SECRET, NODE_ENV, SENTRY_URL } = process.env;
@@ -105,7 +104,6 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
 });
 
 app.post("/upload", upload.array("images"), async (req, res) => {
-    let summary = "";
     let item = "";
 
     const { id, type } = req.body;
@@ -127,9 +125,10 @@ app.post("/upload", upload.array("images"), async (req, res) => {
 
             const status = await uploadFile(prefix, name, buffer);
             if (status === 201) {
-                summary += `${prefix}/${name} created successfully<br>`;
                 uploads.push(`${prefix}/${name}`);
-            } else summary += `${name} bugged with status ${status}\n`;
+            } else {
+                console.log("error uploading file");
+            }
         }
     } catch (error) {
         console.log(error);
@@ -142,12 +141,13 @@ app.use(Sentry.Handlers.errorHandler());
 
 app.use(helmet());
 
-app.use(expressJWT({
+app.use(
+    expressJWT({
         secret: JWT_SECRET,
         algorithms: ["HS256"],
         credentialsRequired: false,
-}));
-
+    })
+);
 
 app.use(
     "/graphql",
