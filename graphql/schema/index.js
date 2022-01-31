@@ -85,7 +85,7 @@ module.exports = buildSchema(`
         color: String
         breed: String
         type: String
-        files: [Upload!]
+        files: [String]
     }
 
     input AnimalSearchInput {
