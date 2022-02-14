@@ -85,8 +85,9 @@ const checkValidID = async (id, item) => {
 };
 
 // endpoint to get images from the server
-app.get("/file/:type/:id/:filename", async (req, res) => {
-    const { type, id, filename } = req.params;
+app.get("/file/:type/:id/*", async (req, res) => {
+    const { type, id } = req.params;
+    const filename = req.params[0];
     console.log(`${filename} requested to be served`);
 
     // check valid id

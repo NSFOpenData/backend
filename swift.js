@@ -55,7 +55,7 @@ const getAuthToken = async () => {
 const uploadFile = async (prefix, filename, stream) => {
     try {
         const authToken = await getAuthToken();
-        const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${prefix}/${filename}`;
+        const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${filename}`;
         const data = await fetch(url, {
             method: "put",
             body: stream,
@@ -80,7 +80,7 @@ const uploadFile = async (prefix, filename, stream) => {
 const getFile = async (prefix, filename) => {
     console.log(`getting file ${filename} from api`);
     const authToken = await getAuthToken();
-    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${prefix}/${filename}`;
+    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${filename}`;
     const data = await fetch(url, {
         method: "get",
         encoding: null,
