@@ -104,37 +104,46 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
 });
 
 app.post("/upload", upload.array("images"), async (req, res) => {
-    let item = "";
-
-    const { id, type } = req.body;
-
-    if (!id || !type) res.status(400).send("both type and id fields required");
-
-    // check valid id
-    item = await uuid.validate(id);
-    if (!item) res.status(404).send(`Invalid uuid provided`);
-
-    // do the uploads
-    let uploads = [];
     try {
-        for (let file of req.files) {
-            console.log("file", file);
-            const { originalname: name, buffer } = file;
-            // console.log("original buffer: ", buffer);
-            const prefix = `${type}/${id}`;
+        const { id, type } = req.body;
+        const parsedId = JSON.parse(id);
 
-            const status = await uploadFile(prefix, name, buffer);
-            if (status === 201) {
-                uploads.push(`${prefix}/${name}`);
-            } else {
-                console.log(status);
+        if (!id || !type) {
+            return res.status(400).send("both type and id fields required");
+        }
+
+        // check valid id
+        for (let i of parsedId) {
+            const item = await uuid.validate(i);
+            if (!item) {
+                return res.status(404).send(`Invalid uuid provided`);
             }
         }
+
+        // do the uploads
+        let uploads = [];
+        try {
+            var index = 0;
+            for (let file of req.files) {
+                const { originalname: name, buffer } = file;
+                // console.log("original buffer: ", buffer);
+                const prefix = `${type}/${parsedId[index]}`;
+                index += 1;
+                const status = await uploadFile(prefix, name, buffer);
+                if (status === 201) {
+                    uploads.push(`${prefix}/${name}`);
+                } else {
+                    console.log(status);
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+        res.status(200).send(uploads.join(","));
     } catch (error) {
         console.log(error);
-        throw error;
     }
-    res.status(200).send(uploads.join(","));
 });
 
 app.use(Sentry.Handlers.errorHandler());

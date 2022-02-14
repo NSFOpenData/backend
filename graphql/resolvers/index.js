@@ -81,8 +81,13 @@ module.exports = {
         //             .on("error", reject),
         //     )
         // },
-        getUniqueID: async () => {
-            return uuid.v4();
+        getUniqueID: async (_, { count }) => {
+            var result = [];
+            for (var i = 0; i < count; i++) {
+                const id = uuid.v4();
+                result.push(id);
+            }
+            return result;
         },
 
         me: async (_, args, { user }) => {

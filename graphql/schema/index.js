@@ -85,7 +85,7 @@ module.exports = buildSchema(`
         color: String
         breed: String
         type: String
-        files: [String]
+        files: [Upload!]
     }
 
     input AnimalSearchInput {
@@ -171,7 +171,7 @@ module.exports = buildSchema(`
         nearestNeighborhood(location: LocationInput!): Neighborhood
         findVehicles(params: VehicleSearchInput!): [Vehicle!]
         findAnimals(params: AnimalSearchInput!): [Animal!]
-        getUniqueID: String
+        getUniqueID(count: Int!): [String!]
         me: User
     }
 
