@@ -104,9 +104,15 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
 });
 
 app.post("/upload", upload.array("images"), async (req, res) => {
-    let item = "";
 
-    const { id, type } = req.body;
+    //setFileName(`vehicle/${imagesID}/${fileChangeEvent.target.files[0].name}`);
+
+    console.log("files", req.files);
+
+    let item = "";
+    const id = uuid.v4();
+
+    const { type } = req.body;
 
     if (!id || !type) res.status(400).send("both type and id fields required");
 
@@ -118,10 +124,12 @@ app.post("/upload", upload.array("images"), async (req, res) => {
     let uploads = [];
     try {
         for (let file of req.files) {
-            console.log("file", file);
-            const { originalname: name, buffer } = file;
+            var { originalname: name, buffer } = file;
             // console.log("original buffer: ", buffer);
             const prefix = `${type}/${id}`;
+
+            // remove all spaces from name
+            name = name.replaceAll(" ", "");
 
             const status = await uploadFile(prefix, name, buffer);
             if (status === 201) {
@@ -134,7 +142,10 @@ app.post("/upload", upload.array("images"), async (req, res) => {
         console.log(error);
         throw error;
     }
-    res.status(200).send(uploads.join(","));
+
+    console.log("uploads: ", uploads);
+
+    res.status(200).send(uploads);
 });
 
 app.use(Sentry.Handlers.errorHandler());
