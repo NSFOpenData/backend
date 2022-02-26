@@ -109,16 +109,11 @@ app.post("/upload", upload.array("images"), async (req, res) => {
 
     console.log("files", req.files);
 
-    let item = "";
     const id = uuid.v4();
 
     const { type } = req.body;
 
-    if (!id || !type) res.status(400).send("both type and id fields required");
-
-    // check valid id
-    item = await uuid.validate(id);
-    if (!item) res.status(404).send(`Invalid uuid provided`);
+    if (!type) res.status(400).send("Id field required");
 
     // do the uploads
     let uploads = [];
