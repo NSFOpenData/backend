@@ -106,8 +106,6 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
 app.post("/upload", upload.array("images"), async (req, res) => {
     //setFileName(`vehicle/${imagesID}/${fileChangeEvent.target.files[0].name}`);
 
-    console.log("files", req.files);
-
     const id = uuid.v4();
 
     const { type } = req.body;
@@ -118,9 +116,11 @@ app.post("/upload", upload.array("images"), async (req, res) => {
     let uploads = [];
     try {
         for (let file of req.files) {
+            console.log(file);
             var { originalname: name, buffer } = file;
             // console.log("original buffer: ", buffer);
             const prefix = `${type}/${id}`;
+            console.log(prefix);
 
             // remove all spaces from name
             name = name.replaceAll(" ", "");
@@ -130,6 +130,7 @@ app.post("/upload", upload.array("images"), async (req, res) => {
                 throw error;
             });
             if (status === 201) {
+                console.log(status);
                 uploads.push(`${prefix}/${name}`);
             } else {
                 console.log(status);
