@@ -104,7 +104,6 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
 });
 
 app.post("/upload", upload.array("images"), async (req, res) => {
-
     //setFileName(`vehicle/${imagesID}/${fileChangeEvent.target.files[0].name}`);
 
     console.log("files", req.files);
@@ -126,7 +125,10 @@ app.post("/upload", upload.array("images"), async (req, res) => {
             // remove all spaces from name
             name = name.replaceAll(" ", "");
 
-            const status = await uploadFile(prefix, name, buffer);
+            const status = await uploadFile(prefix, name, buffer).catch(error => {
+                console.log(error);
+                throw error;
+            });
             if (status === 201) {
                 uploads.push(`${prefix}/${name}`);
             } else {
