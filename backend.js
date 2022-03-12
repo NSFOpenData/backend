@@ -89,9 +89,8 @@ app.get("/file/:type/:id/:filename", async (req, res) => {
     const { type, id, filename } = req.params;
     console.log(`${filename} requested to be served`);
 
-    // check valid id
-    const item = await checkValidID(id, type);
-    if (!item) res.status(404).send(`no ${type} with that id found, type or id might be incorrect`);
+    // verify uuid
+    if (!uuid.validate(id)) res.status(404).send(`no ${type} with that id found, type or id might be incorrect`);
 
     try {
         const prefix = `${type}/${id}`;

@@ -41,6 +41,7 @@ module.exports = {
         },
 
         animals: async (_, args, { user }) => {
+            console.log("animals called");
             if (!user) throw new Error("Authentication needed");
             const { role, neighborhood } = user[DOMAIN];
             if (role === "DEVELOPER") return Animal.find({});
