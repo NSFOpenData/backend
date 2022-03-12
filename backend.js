@@ -12,8 +12,6 @@ const mongoose = require("mongoose");
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolvers = require("./graphql/resolvers");
 const { uploadFile, getFile } = require("./swift");
-const { Animal } = require("./models/animal");
-const { Vehicle } = require("./models/vehicle");
 const uuid = require("uuid");
 
 const { makeExecutableSchema } = require("@graphql-tools/schema");
@@ -70,19 +68,19 @@ const upload = multer({ storage: storage });
  * @param {String} item animal / vehicle to fetch the object from
  * @returns the object if found else null
  */
-const checkValidID = async (id, item) => {
-    item = item.toLowerCase();
-    // map to the database model
-    const object = {
-        vehicle: Vehicle,
-        animal: Animal,
-    };
-    // check if it is in the object
-    if (!Object.prototype.hasOwnProperty.call(object, item)) return false;
+// const checkValidID = async (id, item) => {
+//     item = item.toLowerCase();
+//     // map to the database model
+//     const object = {
+//         vehicle: Vehicle,
+//         animal: Animal,
+//     };
+//     // check if it is in the object
+//     if (!Object.prototype.hasOwnProperty.call(object, item)) return false;
 
-    const found = await object[item].findById(id);
-    return found;
-};
+//     const found = await object[item].findById(id);
+//     return found;
+// };
 
 // endpoint to get images from the server
 app.get("/file/:type/:id/:filename", async (req, res) => {
