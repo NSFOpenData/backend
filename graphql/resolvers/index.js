@@ -7,13 +7,14 @@ const { Vehicle, PartialVehicle } = require("../../models/vehicle");
 const { Animal, PartialAnimal } = require("../../models/animal");
 const User = require("../../models/user");
 const Neighborhood = require("../../models/neighborhood");
-var admin = require("firebase-admin");
+// var admin = require("firebase-admin");
+import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
 
 var uuid = require("uuid");
 
 const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
 
-admin.initializeApp({
+GoogleAuth.init({
     apiKey: "AIzaSyBdtgJTpg8-pYIb7sMny70qeJICM-fiSqY",
     authDomain: "nsfopendata.firebaseapp.com",
     projectId: "nsfopendata",
@@ -218,8 +219,7 @@ module.exports = {
             // idToken comes from the client app
             var token = " ";
 
-            admin
-                .auth()
+            GoogleAuth.signIn()
                 .verifyIdToken(idToken)
                 .then(decodedToken => {
                     const uid = decodedToken.uid;

@@ -148,7 +148,7 @@ app.post("/upload", upload.array("images"), async (req, res) => {
 
 app.use(Sentry.Handlers.errorHandler());
 
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 
 app.use(
     expressJWT({
