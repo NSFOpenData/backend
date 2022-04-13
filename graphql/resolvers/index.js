@@ -41,6 +41,7 @@ module.exports = {
         },
 
         animals: async (_, args, { user }) => {
+            console.log("animals called");
             if (!user) throw new Error("Authentication needed");
             const { role, neighborhood } = user[DOMAIN];
             if (role === "DEVELOPER") return Animal.find({});
@@ -94,6 +95,8 @@ module.exports = {
 
     Mutation: {
         createVehicle: async (_, { vehicle }, { user }) => {
+            console.log("input vehicle ", vehicle);
+
             if (!user) throw new Error("Authentication needed");
 
             const { lat, lon, name } = vehicle.location;
@@ -140,6 +143,7 @@ module.exports = {
         },
 
         createAnimal: async (_, { animal }, { user }) => {
+            console.log("input animal ", animal);
             if (!user) throw new Error("Authentication needed");
             const { lat, lon, name } = animal.location;
             if (!name) animal.location.name = await getLocation(lat, lon);
@@ -168,6 +172,7 @@ module.exports = {
 
         // to create descriptions that can be matched against to alert the user
         createPartialAnimal: async (_, { partial }, { user }) => {
+            console.log("input partial animal ", partial);
             if (!user) throw new Error("Authentication needed");
             const { neighborhood } = user[DOMAIN];
             const partialAnimalDoc = new PartialAnimal({ createdBy: user.sub, neighborhood, ...partial });

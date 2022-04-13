@@ -53,18 +53,23 @@ const getAuthToken = async () => {
  * @returns status code of the request
  */
 const uploadFile = async (prefix, filename, stream) => {
-    const authToken = await getAuthToken();
-    const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${prefix}/${filename}`;
-    const data = await fetch(url, {
-        method: "put",
-        body: stream,
-        headers: {
-            "X-Auth-Token": authToken,
-            "X-Detect-Content-Type": true,
-            "X-Object-Meta-ID": prefix,
-        },
-    });
-    return data.status;
+    try {
+        const authToken = await getAuthToken();
+        const url = `https://swift.isis.vanderbilt.edu/swift/v1/test/${prefix}/${filename}`;
+        const data = await fetch(url, {
+            method: "put",
+            body: stream,
+            headers: {
+                "X-Auth-Token": authToken,
+                "X-Detect-Content-Type": true,
+                "X-Object-Meta-ID": prefix,
+            },
+        });
+        return data.status;
+    } catch (error) {
+        console.log(error);
+        return error;
+    }
 };
 
 /**

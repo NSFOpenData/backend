@@ -27,6 +27,7 @@ const makeBody = async obj => {
 
             // get image and buffer it
             const data = await getFile(prefix, fileName);
+            console.log("data: ", data); // todo: delete
             const arrayBuffer = await data.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
 

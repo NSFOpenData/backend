@@ -76,7 +76,7 @@ module.exports = buildSchema(`
         breed: String
         type: String
         imagesID: String
-        files: [String!]
+        files: [String]
     }
 
     input AnimalInput {
