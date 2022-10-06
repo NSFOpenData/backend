@@ -7,21 +7,25 @@ const { Vehicle, PartialVehicle } = require("../../models/vehicle");
 const { Animal, PartialAnimal } = require("../../models/animal");
 const User = require("../../models/user");
 const Neighborhood = require("../../models/neighborhood");
-var admin = require("firebase-admin");
+// var admin = require("firebase-admin");
+const {OAuth2Client} = require('google-auth-library');
+const {CLIENT_ID} = require ('../../lib/constants');
+const client = new OAuth2Client(CLIENT_ID.id);
+
 
 var uuid = require("uuid");
 
 const DOMAIN = "https://nsf-scc1.isis.vanderbilt.edu/graphql";
 
-admin.initializeApp({
-    apiKey: "AIzaSyBdtgJTpg8-pYIb7sMny70qeJICM-fiSqY",
-    authDomain: "nsfopendata.firebaseapp.com",
-    projectId: "nsfopendata",
-    storageBucket: "nsfopendata.appspot.com",
-    messagingSenderId: "534112304877",
-    appId: "1:534112304877:web:82adc6a18d014a931cd6e4",
-    measurementId: "G-67PGJ786CW",
-});
+// admin.initializeApp({
+//     apiKey: "AIzaSyBdtgJTpg8-pYIb7sMny70qeJICM-fiSqY",
+//     authDomain: "nsfopendata.firebaseapp.com",
+//     projectId: "nsfopendata",
+//     storageBucket: "nsfopendata.appspot.com",
+//     messagingSenderId: "534112304877",
+//     appId: "1:534112304877:web:82adc6a18d014a931cd6e4",
+//     measurementId: "G-67PGJ786CW",
+// });
 
 module.exports = {
     Upload: GraphQLUpload,
@@ -194,7 +198,7 @@ module.exports = {
         },
 
         register: async (_, args) => {
-            const { name, email, neighborhood } = args.user;
+            const { name, email, neighborhood, token } = args.user;
             const neighborhoodFound = await Neighborhood.findOne({ name: neighborhood });
             if (!neighborhoodFound) throw new Error(`Neighborhood with name ${neighborhood} not found`);
 
@@ -214,29 +218,25 @@ module.exports = {
          * @param {Object} args - idToken and email:
          * @returns LoginPayload
          */
-        login: async (_, { idToken, email }) => {
-            // verify the token
-            // idToken comes from the client app
-            var token = " ";
-
-            admin
-                .auth()
-                .verifyIdToken(idToken)
-                .then(decodedToken => {
-                    const uid = decodedToken.uid;
-                    console.log("UID:  ", uid); // todo: delete this line after testing
-                })
-                .catch(error => {
-                    // Handle error
-
-                    throw new Error(error);
-                });
-
+        // login: async (_, { idToken, email }) => {
+        login: async (_, {token}) => {
+            const ticket = await client.verifyIdToken({
+                idToken: token,
+                requiredAudience: CLIENT_ID,
+            }).catch (console.error);
+            
+            const payload = ticket.getPayload();
+            if (!payload['email_verified']){
+                return {status: 'INVALID_TOKEN'};
+            }
+            const email = payload['email'];
+            // console.log(email);
             const user = await User.findOne({ email: email }).populate("neighborhood");
-
-            const { id, role, neighborhood } = user;
-            // eslint-disable-next-line no-const-assign
-            token = jwt.sign(
+            console.log(user);
+            if (!!user){
+                return {status: 'REQUEST_SIGNUP'};
+            }
+            newtToken = jwt.sign(
                 {
                     [DOMAIN]: {
                         email,
@@ -251,17 +251,51 @@ module.exports = {
                     expiresIn: "7d",
                 }
             );
-            return { token, user };
+            return {status: "SUCESS", user: user, jwtToken : newToken };
         },
+            // var token = " "
+        //     admin
+        //         .auth()
+        //         .verifyIdToken(idToken)
+        //         .then(decodedToken => {
+        //             const uid = decodedToken.uid;
+        //             console.log("UID:  ", uid); // todo: delete this line after testing
+        //         })
+        //         .catch(error => {
+        //             // Handle error
+
+        //             throw new Error(error);
+        //         });
+
+        //     const user = await User.findOne({ email: email }).populate("neighborhood");
+
+        //     const { id, role, neighborhood } = user;
+        //     // eslint-disable-next-line no-const-assign
+        //     token = jwt.sign(
+        //         {
+        //             [DOMAIN]: {
+        //                 email,
+        //                 role,
+        //                 neighborhood: neighborhood.name,
+        //             },
+        //         },
+        //         process.env.JWT_SECRET,
+        //         {
+        //             algorithm: "HS256",
+        //             subject: id,
+        //             expiresIn: "7d",
+        //         }
+        //     );
+        //     return { token, user };
+        // },
 
         /**
          * Checks if the user with the given email is in the database.
          * @param {String} email - email of the user
          * @returns True if user is found, false otherwise
          */
-        isRegistered: async (_, { email }) => {
-            const user = await User.findOne({ email: email }).populate("neighborhood");
-            return !!user; // returns true if user is found
-        },
+        // isRegistered: async (_, { email }) => {
+
+        // },
     },
 };

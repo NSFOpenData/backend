@@ -182,7 +182,7 @@ module.exports = buildSchema(`
         createPartialAnimal(partial: PartialAnimalInput!): PartialAnimal!
         createPartialVehicle(partial: PartialVehicleInput!): PartialVehicle!
         register(user: RegistrationInput): User!
-        login(idToken: String!, email: String!): LoginPayload!
+        login(token: String!): String
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
         isRegistered(email: String!): Boolean!

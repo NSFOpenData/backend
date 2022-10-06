@@ -8,6 +8,7 @@ const multer = require("multer");
 const expressPlayground = require("graphql-playground-middleware-express").default; // for testing auth
 const cors = require("cors");
 const mongoose = require("mongoose");
+const CLIENT_ID = require ("./lib/constants");
 
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolvers = require("./graphql/resolvers");
@@ -27,22 +28,45 @@ app.use(Sentry.Handlers.requestHandler());
 
 app.use(cors());
 
-const html = `
-<!DOCTYPE html>
-    <head><title>nsf open data</title></head>
-    <body>
-    Hello World! This is a GraphQL API. Check out /graphql or /playground<br>
-    <form action="/upload" enctype="multipart/form-data" method="post">
-    <div>
-        <input type="text" placeholder="Object ID" name="id">
-        <input type="text" placeholder="Type: vehicle or animal" name="type">
-        <input type="file" name="images" multiple>
-        <input type="submit" value="upload">            
-    </div>
-    </form>
-    </body>
-</html>
-`;
+// const html = `
+// <!DOCTYPE html>
+//     <head><title>nsf open data</title></head>
+//     <body>
+//     Hello World! This is a GraphQL API. Check out /graphql or /playground<br>
+//     <form action="/upload" enctype="multipart/form-data" method="post">
+//     <div>
+//         <input type="text" placeholder="Object ID" name="id">
+//         <input type="text" placeholder="Type: vehicle or animal" name="type">
+//         <input type="file" name="images" multiple>
+//         <input type="submit" value="upload">            
+//     </div>
+//     </form>
+//     </body>
+// </html>
+// `;
+
+const html = `<html>
+<body>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+      function handleCredentialResponse(response) {
+        console.log("Encoded JWT ID token: " + response.credential);
+      }
+      window.onload = function () {
+        google.accounts.id.initialize({
+          client_id: "303486397933-hgjhg2hu6tvagodipr9egkh52tt6n69r.apps.googleusercontent.com",
+          callback: handleCredentialResponse
+        });
+        google.accounts.id.renderButton(
+          document.getElementById("buttonDiv"),
+          { theme: "outline", size: "large" }  // customization attributes
+        );
+        google.accounts.id.prompt(); // also display the One Tap dialog
+      }
+  </script>
+  <div id="buttonDiv"></div> 
+</body>
+</html>`;
 
 const schema = makeExecutableSchema({
     typeDefs: graphqlSchema,
@@ -168,7 +192,7 @@ const uri = DB;
 const options = {};
 mongoose
     .connect(uri, options)
-    .then(() => app.listen(3000, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
+    .then(() => app.listen(8080, console.log(`Server is running, env: ${NODE_ENV || "development"}`)))
     .catch(error => {
         throw error;
     });
