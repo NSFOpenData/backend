@@ -177,15 +177,15 @@ module.exports = buildSchema(`
         me: User
     }
 
-    type loginStatus{
-        status: String
-        token: String!
-        user: User!
+    type authStatus{
+        status: String!
+        token: String
+        user: User
     }
 
     type verifyToken{
-        status: String
-        user: User!
+        status: String!
+        user: User
     }
 
     type Mutation {
@@ -194,8 +194,8 @@ module.exports = buildSchema(`
         createNeighborhood(name: String!, location: LocationInput!, dataRetention: String!): Neighborhood!
         createPartialAnimal(partial: PartialAnimalInput!): PartialAnimal!
         createPartialVehicle(partial: PartialVehicleInput!): PartialVehicle!
-        register(user: RegistrationInput): User!
-        login(token: String): loginStatus
+        register(user: RegistrationInput): authStatus!
+        login(token: String): authStatus!
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
     }

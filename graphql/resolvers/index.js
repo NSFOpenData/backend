@@ -199,9 +199,11 @@ module.exports = {
         },
 
         register: async (_, args) => {
-            const { name, email, neighborhood, token } = args.user;
+            const { name, email, neighborhood } = args.user;
             const neighborhoodFound = await Neighborhood.findOne({ name: neighborhood });
-            if (!neighborhoodFound) throw new Error(`Neighborhood with name ${neighborhood} not found`);
+            if (!neighborhoodFound) return {status: "INVALID_NEIGHBORHOOD"};
+            const userFound = await User.findOne({ email: email }).populate("neighborhood");
+            if (userFound) return {status: "USER_EXISTS"}
 
             const user = new User({
                 name,
@@ -209,17 +211,18 @@ module.exports = {
                 role: "USER",
                 neighborhood: neighborhoodFound.id,
             });
+
             const newUser = await user.save().then(u => u.populate("neighborhood"));
-            return newUser;
+            const newToken = await generateToken(newUser);
+            return {status: "SUCCESS", user: newUser, token: newToken};
         },
 
         /**
          * Logs the user in or redirects if not registered.
          * Note: to pass in the actual idToken, call the user.getIdToken() method
-         * @param {Object} args - idToken and email:
-         * @returns LoginPayload
+         * @param {Object} args - idToken
+         * @returns status and user info
          */
-        // login: async (_, { idToken, email }) => {
         login: async (_, {token}) => {
             //verify token
             const verify  = await verifyToken(token).catch(e => console.log(e));
@@ -231,6 +234,5 @@ module.exports = {
             const newToken = await generateToken(user);
             return {status: "SUCCESS", user: user, token : newToken };
         },
-        
     },
 };
