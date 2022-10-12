@@ -198,8 +198,6 @@ module.exports = buildSchema(`
         login(token: String): loginStatus
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
-        generateToken(user: userInput!): String
-        verifyToken(token: String!): verifyToken
     }
 
     schema {

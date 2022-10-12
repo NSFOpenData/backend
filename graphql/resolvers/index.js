@@ -9,7 +9,8 @@ const User = require("../../models/user");
 const Neighborhood = require("../../models/neighborhood");
 // var admin = require("firebase-admin");
 const {OAuth2Client} = require('google-auth-library');
-const {CLIENT_ID} = require ('../../lib/constants');
+const CLIENT_ID = require ('../../lib/constants');
+const {generateToken, verifyToken} = require ('../../lib/auth');
 const client = new OAuth2Client(CLIENT_ID.id);
 
 
@@ -220,83 +221,16 @@ module.exports = {
          */
         // login: async (_, { idToken, email }) => {
         login: async (_, {token}) => {
-            // const verify  = await verifyIdToken(token);
-            // if (verify.status !== 'VALID_USER'){
-            //     return verify;
-            // }
-            const ticket = await client.verifyIdToken({
-                idToken: token,
-                requiredAudience: CLIENT_ID,
-            }).catch (console.error);
-            
-            const payload = ticket.getPayload();
-            if (!payload['email_verified']){
-                return {status: 'INVALID_TOKEN'};
+            //verify token
+            const verify  = await verifyToken(token).catch(e => console.log(e));
+            if (verify.status !== "VALID_USER"){
+                return verify;
             }
-            const email = payload['email'];
-            const user = await User.findOne({ email: email }).populate("neighborhood");
-
-            if (!user){
-                return {status: 'NO_EXISTING_USER'};
-            }
-            
+            const user = verify.user;
             //generate token
-            const newToken = jwt.sign(
-                {
-                    [DOMAIN]: {
-                        email : user.email,
-                        role : user.role,
-                        neighborhood: user.neighborhood,
-                    },
-                },
-                process.env.JWT_SECRET,
-                {
-                    algorithm: "HS256",
-                    subject: user._id.toString(),
-                    expiresIn: "7d",
-                }
-            );
-            // const newToken = await generateToken(verify.user);
-            return {status: "SUCESS", user: user, token : newToken };
+            const newToken = await generateToken(user);
+            return {status: "SUCCESS", user: user, token : newToken };
         },
-
-        verifyToken: async (_, {token}) => {
-            const ticket = await client.verifyIdToken({
-                idToken: token,
-                requiredAudience: CLIENT_ID,
-            }).catch (console.error);
-            
-            const payload = ticket.getPayload();
-            if (!payload['email_verified']){
-                return {status: 'INVALID_TOKEN'};
-            }
-            const email = payload['email'];
-            const user = await User.findOne({ email: email }).populate("neighborhood");
-
-            if (!user){
-                return {status: 'NO_EXISTING_USER'};
-            }
-
-            return {status: "VALID_USER", user: user};
-        },
-
-        generateToken: async (_, {user} ) => {
-            const token = jwt.sign(
-                {
-                    [DOMAIN]: {
-                        email : user.email,
-                        role : user.role,
-                        neighborhood: user.neighborhood,
-                    },
-                },
-                process.env.JWT_SECRET,
-                {
-                    algorithm: "HS256",
-                    subject: user._id.toString(),
-                    expiresIn: "7d",
-                }
-            );
-            return token;
-        }
+        
     },
 };
