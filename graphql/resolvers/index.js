@@ -220,6 +220,10 @@ module.exports = {
          */
         // login: async (_, { idToken, email }) => {
         login: async (_, {token}) => {
+            // const verify  = await verifyIdToken(token);
+            // if (verify.status !== 'VALID_USER'){
+            //     return verify;
+            // }
             const ticket = await client.verifyIdToken({
                 idToken: token,
                 requiredAudience: CLIENT_ID,
@@ -230,72 +234,69 @@ module.exports = {
                 return {status: 'INVALID_TOKEN'};
             }
             const email = payload['email'];
-            // console.log(email);
             const user = await User.findOne({ email: email }).populate("neighborhood");
-            console.log(user);
-            if (!!user){
-                return {status: 'REQUEST_SIGNUP'};
+
+            if (!user){
+                return {status: 'NO_EXISTING_USER'};
             }
-            newtToken = jwt.sign(
+            
+            //generate token
+            const newToken = jwt.sign(
                 {
                     [DOMAIN]: {
-                        email,
-                        role,
-                        neighborhood: neighborhood.name,
+                        email : user.email,
+                        role : user.role,
+                        neighborhood: user.neighborhood,
                     },
                 },
                 process.env.JWT_SECRET,
                 {
                     algorithm: "HS256",
-                    subject: id,
+                    subject: user._id.toString(),
                     expiresIn: "7d",
                 }
             );
-            return {status: "SUCESS", user: user, jwtToken : newToken };
+            // const newToken = await generateToken(verify.user);
+            return {status: "SUCESS", user: user, token : newToken };
         },
-            // var token = " "
-        //     admin
-        //         .auth()
-        //         .verifyIdToken(idToken)
-        //         .then(decodedToken => {
-        //             const uid = decodedToken.uid;
-        //             console.log("UID:  ", uid); // todo: delete this line after testing
-        //         })
-        //         .catch(error => {
-        //             // Handle error
 
-        //             throw new Error(error);
-        //         });
+        verifyToken: async (_, {token}) => {
+            const ticket = await client.verifyIdToken({
+                idToken: token,
+                requiredAudience: CLIENT_ID,
+            }).catch (console.error);
+            
+            const payload = ticket.getPayload();
+            if (!payload['email_verified']){
+                return {status: 'INVALID_TOKEN'};
+            }
+            const email = payload['email'];
+            const user = await User.findOne({ email: email }).populate("neighborhood");
 
-        //     const user = await User.findOne({ email: email }).populate("neighborhood");
+            if (!user){
+                return {status: 'NO_EXISTING_USER'};
+            }
 
-        //     const { id, role, neighborhood } = user;
-        //     // eslint-disable-next-line no-const-assign
-        //     token = jwt.sign(
-        //         {
-        //             [DOMAIN]: {
-        //                 email,
-        //                 role,
-        //                 neighborhood: neighborhood.name,
-        //             },
-        //         },
-        //         process.env.JWT_SECRET,
-        //         {
-        //             algorithm: "HS256",
-        //             subject: id,
-        //             expiresIn: "7d",
-        //         }
-        //     );
-        //     return { token, user };
-        // },
+            return {status: "VALID_USER", user: user};
+        },
 
-        /**
-         * Checks if the user with the given email is in the database.
-         * @param {String} email - email of the user
-         * @returns True if user is found, false otherwise
-         */
-        // isRegistered: async (_, { email }) => {
-
-        // },
+        generateToken: async (_, {user} ) => {
+            const token = jwt.sign(
+                {
+                    [DOMAIN]: {
+                        email : user.email,
+                        role : user.role,
+                        neighborhood: user.neighborhood,
+                    },
+                },
+                process.env.JWT_SECRET,
+                {
+                    algorithm: "HS256",
+                    subject: user._id.toString(),
+                    expiresIn: "7d",
+                }
+            );
+            return token;
+        }
     },
 };

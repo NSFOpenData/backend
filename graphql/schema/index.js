@@ -154,9 +154,11 @@ module.exports = buildSchema(`
         """
         not sure how this will look like yet
         """
-        name: String
-        email: String
+        _id: ID!
+        name: String!
+        email: String!
         neighborhood: String
+        role: Role!
     }
 
     type LoginPayload {
@@ -175,6 +177,17 @@ module.exports = buildSchema(`
         me: User
     }
 
+    type loginStatus{
+        status: String
+        token: String!
+        user: User!
+    }
+
+    type verifyToken{
+        status: String
+        user: User!
+    }
+
     type Mutation {
         createVehicle(vehicle: VehicleInput): Vehicle
         createAnimal(animal: AnimalInput): Animal
@@ -182,10 +195,11 @@ module.exports = buildSchema(`
         createPartialAnimal(partial: PartialAnimalInput!): PartialAnimal!
         createPartialVehicle(partial: PartialVehicleInput!): PartialVehicle!
         register(user: RegistrationInput): User!
-        login(token: String!): String
+        login(token: String): loginStatus
         addPrivilege(email: String!): String
         changePermissions(id: ID!): Neighborhood!
-        isRegistered(email: String!): Boolean!
+        generateToken(user: userInput!): String
+        verifyToken(token: String!): verifyToken
     }
 
     schema {
