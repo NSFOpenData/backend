@@ -47,7 +47,7 @@
         "express-jwt": "^6.0.0",
         "faker": "^5.5.3",
         "firebase": "^9.0.2",
-        "firebase-admin": "^10.0.2",
+        "firebase-admin": "^10.3.0",
         "geolib": "^3.3.1",
         "google-auth-library": "^8.5.2",
         "graphql-playground-middleware-express": "^1.7.22",
@@ -61,6 +61,7 @@
         "multer": "^1.4.2",
         "node-fetch": "^2.6.1",
         "nodemailer": "^6.6.3",
+        "nodemon": "^2.0.20",
         "shortid": "^2.2.16",
         "uuid": "^8.3.2"
     },

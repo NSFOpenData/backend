@@ -10,7 +10,7 @@ const Neighborhood = require("../../models/neighborhood");
 // var admin = require("firebase-admin");
 const {OAuth2Client} = require('google-auth-library');
 const CLIENT_ID = require ('../../lib/constants');
-const {generateToken, verifyToken} = require ('../../lib/auth');
+const {generateToken, verifyUser, verifySignInToken} = require ('../../lib/auth');
 const client = new OAuth2Client(CLIENT_ID.id);
 
 
@@ -200,10 +200,16 @@ module.exports = {
 
         register: async (_, args) => {
             const { name, email, neighborhood } = args.user;
-            const neighborhoodFound = await Neighborhood.findOne({ name: neighborhood });
+            const neighborhoodFound = await Neighborhood.findOne({ name: neighborhood }).catch(e => {
+                console.log(e)
+                return {status: "ERROR"};
+            });
             if (!neighborhoodFound) return {status: "INVALID_NEIGHBORHOOD"};
-            const userFound = await User.findOne({ email: email }).populate("neighborhood");
-            if (userFound) return {status: "USER_EXISTS"}
+            const userFound = await User.findOne({ email: email }).populate("neighborhood").catch(e => {
+                console.log(e)
+                return {status: "ERROR"};
+            });
+            if (userFound) return {status: "USER_EXISTS"};
 
             const user = new User({
                 name,
@@ -212,8 +218,14 @@ module.exports = {
                 neighborhood: neighborhoodFound.id,
             });
 
-            const newUser = await user.save().then(u => u.populate("neighborhood"));
-            const newToken = await generateToken(newUser);
+            const newUser = await user.save().then(u => u.populate("neighborhood")).catch(e => {
+                console.log(e)
+                return {status: "ERROR"};
+            });
+            const newToken = await generateToken(newUser).catch(e => {
+                console.log(e)
+                return {status: "ERROR"};
+            });
             return {status: "SUCCESS", user: newUser, token: newToken};
         },
 
@@ -225,14 +237,29 @@ module.exports = {
          */
         login: async (_, {token}) => {
             //verify token
-            const verify  = await verifyToken(token).catch(e => console.log(e));
-            if (verify.status !== "VALID_USER"){
+            const email  = await verifySignInToken(token).catch(e => {
+                console.log(e)
+                return {status: "ERROR"};
+            });
+            console.log(email)
+            if (email.status != "SUCCESS"){
+                return email;
+            }
+            //verify email 
+            const verify  = await verifyUser(email.email).catch(e => {
+                console.log(e)
+                return {status: "ERROR"};
+            });
+            if (verify.status != "VALID_USER"){
                 return verify;
             }
             const user = verify.user;
             //generate token
-            const newToken = await generateToken(user);
-            return {status: "SUCCESS", user: user, token : newToken };
+            const newToken = await generateToken(user).catch(e => {
+                console.log(e)
+                return {status: "ERROR"};
+            });
+            return {status: "SUCCESS", user, newToken};
         },
     },
 };
