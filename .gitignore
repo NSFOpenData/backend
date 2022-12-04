@@ -1,5 +1,5 @@
 .env
 node_modules/
-lib/service-account-file.json
+lib/serviceAccountKey.json
 graphql/.DS_Store
-  .DS_Store
+.DS_Store

@@ -179,8 +179,8 @@ module.exports = buildSchema(`
 
     type authStatus{
         status: String!
-        token: String
         user: User
+        newToken: String
     }
 
     type verifyToken{

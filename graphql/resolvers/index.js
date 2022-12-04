@@ -259,6 +259,7 @@ module.exports = {
                 console.log(e)
                 return {status: "ERROR"};
             });
+            console.log(newToken)
             return {status: "SUCCESS", user, newToken};
         },
     },
