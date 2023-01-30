@@ -44,7 +44,7 @@
         "express": "^4.17.1",
         "express-graphiql-middleware": "^1.0.4",
         "express-graphql": "^0.12.0",
-        "express-jwt": "^6.0.0",
+        "express-jwt": "^8.4.0",
         "faker": "^5.5.3",
         "firebase": "^9.0.2",
         "firebase-admin": "^10.0.2",
